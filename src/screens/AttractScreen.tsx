@@ -1,0 +1,74 @@
+import { useCallback } from 'react'
+import { motion } from 'framer-motion'
+
+import { useAdminGesture } from '../admin/useAdminGesture'
+import { config } from '../app/config'
+import { useAudio } from '../audio/audioContext'
+import { BrandLogo } from '../components/BrandLogo'
+import { ThemedBackground } from '../components/ThemedBackground'
+import { TouchButton } from '../components/TouchButton'
+import { t } from '../i18n'
+import { useGameStore } from '../store/gameStore'
+import { useSettingsStore } from '../store/settingsStore'
+
+/**
+ * The idle loop. The whole surface is tappable — on a kiosk people press
+ * the artwork, not the button — with the button present as the obvious
+ * affordance for anyone who looks for one.
+ */
+export function AttractScreen() {
+  const chooseMode = useGameStore((state) => state.chooseMode)
+  const { unlock } = useAudio()
+  const gameTitle = useSettingsStore((state) => state.gameTitle)
+  const eventTitle = useSettingsStore((state) => state.eventTitle)
+  const tagline = config.branding.tagline
+  const adminTap = useAdminGesture()
+
+  // Browsers will not start audio before a user gesture, and this tap is
+  // the first one of the session — without it the whole game is silent.
+  const start = useCallback(() => {
+    unlock()
+    chooseMode()
+  }, [unlock, chooseMode])
+
+  return (
+    <ThemedBackground slot="attract" scrim="soft">
+      <div
+        onClick={start}
+        className="flex h-full w-full flex-col items-center justify-center gap-12 px-12 text-center"
+      >
+        {/* The gesture must not also start a game, so the tap stops here. */}
+        <span
+          onClick={(event) => {
+            event.stopPropagation()
+            adminTap()
+          }}
+        >
+          <BrandLogo size="lg" />
+        </span>
+
+        <div className="space-y-6">
+          <h1 className="text-display text-[clamp(3rem,9vw,8rem)] leading-[1.05] text-text-primary">
+            {gameTitle}
+          </h1>
+          <p className="text-display text-[clamp(1.5rem,3vw,2.75rem)] text-accent">
+            {eventTitle}
+          </p>
+          <p className="text-2xl text-text-secondary">{tagline}</p>
+        </div>
+
+        <TouchButton size="xl" onClick={start}>
+          {t.common.startChallenge}
+        </TouchButton>
+
+        <motion.p
+          animate={{ opacity: [0.35, 1, 0.35] }}
+          transition={{ duration: 2.4, repeat: Infinity, ease: 'easeInOut' }}
+          className="text-xl text-text-secondary"
+        >
+          {t.attract.tapToStart}
+        </motion.p>
+      </div>
+    </ThemedBackground>
+  )
+}

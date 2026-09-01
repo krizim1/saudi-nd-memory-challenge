@@ -1,0 +1,25 @@
+<!--
+  Najdi-inspired tile, drawn to repeat seamlessly at 240×240.
+
+  The motif is the triangular relief of Najdi mud-brick parapets: a row
+  of stepped triangles over a band of pierced squares. Kept to thin
+  strokes in a single light tone, because it is layered at very low
+  opacity behind content and must read as texture, never as decoration
+  competing with the copy.
+-->
+<svg xmlns="http://www.w3.org/2000/svg" width="240" height="240" viewBox="0 0 240 240">
+  <g fill="none" stroke="#F5F3EC" stroke-width="2" stroke-linejoin="round">
+    <!-- Stepped triangle band, mirrored so the tile meets itself. -->
+    <path d="M0 60 L30 10 L60 60 L90 10 L120 60 L150 10 L180 60 L210 10 L240 60" />
+    <path d="M0 180 L30 230 L60 180 L90 230 L120 180 L150 230 L180 180 L210 230 L240 180" />
+
+    <!-- Pierced squares, set on the diagonal between the bands. -->
+    <rect x="16" y="104" width="32" height="32" transform="rotate(45 32 120)" />
+    <rect x="76" y="104" width="32" height="32" transform="rotate(45 92 120)" />
+    <rect x="136" y="104" width="32" height="32" transform="rotate(45 152 120)" />
+    <rect x="196" y="104" width="32" height="32" transform="rotate(45 212 120)" />
+
+    <!-- Connecting rule that carries the eye across the repeat. -->
+    <path d="M0 120 H8 M56 120 H68 M116 120 H128 M176 120 H188 M236 120 H240" />
+  </g>
+</svg>
