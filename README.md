@@ -1,4 +1,6 @@
-# تحدي الذاكرة — Saudi Memory Challenge
+# Saudi ND — Memory Challenge
+
+**تحدي الذاكرة — اليوم الوطني السعودي**
 
 Touchscreen memory game for a Saudi National Day event activation, in
 two modes: a solo run, or a two-player head-to-head. Arabic-first,

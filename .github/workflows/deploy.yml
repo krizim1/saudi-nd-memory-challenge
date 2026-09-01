@@ -1,8 +1,10 @@
 # Builds the game and publishes it to GitHub Pages.
 #
-# The base path is taken from the repository name, because a Pages
-# project site is served from `https://<user>.github.io/<repo>/` rather
-# than a domain root. Nothing in the app hardcodes it.
+# A Pages project site is served from `https://<user>.github.io/<repo>/`
+# rather than a domain root, so the build needs that sub-path. It is
+# derived from GITHUB_REPOSITORY at build time: renaming the repository
+# changes the deployed URL with no edit here, and nothing in the app
+# hardcodes it either.
 name: Deploy
 
 on:
@@ -43,7 +45,8 @@ jobs:
         run: npm test
 
       - name: Build
-        run: npx vite build --base=/${{ github.event.repository.name }}/
+        # ${GITHUB_REPOSITORY#*/} strips the owner, leaving the repo name.
+        run: npx vite build --base="/${GITHUB_REPOSITORY#*/}/"
 
       - uses: actions/upload-pages-artifact@v3
         with:
