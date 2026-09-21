@@ -1,5 +1,4 @@
 import { config } from '../app/config'
-import { Emblem96 } from '../components/Emblem96'
 import { ScreenLayout } from '../components/ScreenLayout'
 import { TouchButton } from '../components/TouchButton'
 import type { LeaderboardEntry } from '../game/types'
@@ -61,6 +60,16 @@ function CrownIcon() {
     <svg viewBox="0 0 80 50" aria-hidden className="h-[3.8vh] w-auto" fill="currentColor">
       <path d="M8 44 L14 14 L28 28 L40 6 L52 28 L66 14 L72 44 Z" />
       <rect x="8" y="44" width="64" height="5" rx="2.5" />
+    </svg>
+  )
+}
+
+function TrophyIcon() {
+  return (
+    <svg viewBox="0 0 64 64" aria-hidden className="h-[12vh] w-auto" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M20 10h24v14a12 12 0 0 1-24 0z" />
+      <path d="M20 14h-8v4a8 8 0 0 0 8 8M44 14h8v4a8 8 0 0 1-8 8" />
+      <path d="M32 36v10M22 54h20M26 46h12v8H26z" />
     </svg>
   )
 }
@@ -190,7 +199,9 @@ export function LeaderboardScreen() {
 
         {shown.length === 0 ? (
           <div className="flex w-full max-w-3xl flex-col items-center gap-4 rounded-3xl border border-accent/30 bg-surface px-10 py-[9vh] text-center">
-            <Emblem96 aria-hidden role="presentation" className="h-[12vh] w-auto opacity-70" />
+            <span className="text-accent opacity-80">
+              <TrophyIcon />
+            </span>
             <p className="text-display text-[clamp(1.5rem,3.4vh,2.4rem)] text-text-primary">
               {loading ? '' : t.leaderboard.empty}
             </p>

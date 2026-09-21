@@ -1,4 +1,3 @@
-import { Emblem96 } from '../Emblem96'
 import { useTheme } from '../../theme/themeContext'
 import { useImageAsset } from '../ThemedBackground/useImageAsset'
 
@@ -12,6 +11,13 @@ function triangleBand(y: number, pointing: 'down' | 'up'): string {
   return segments.join('')
 }
 
+/** Eight-point star, centred on (150, 200). */
+const medallionStar = Array.from({ length: 16 }, (_, i) => {
+  const radius = i % 2 === 0 ? 78 : 54
+  const angle = (Math.PI * i) / 8 - Math.PI / 2
+  return `${(150 + radius * Math.cos(angle)).toFixed(1)},${(200 + radius * Math.sin(angle)).toFixed(1)}`
+}).join(' ')
+
 const topBand = triangleBand(34, 'down')
 const bottomBand = triangleBand(366, 'up')
 
@@ -19,8 +25,8 @@ const bottomBand = triangleBand(366, 'up')
  * The reverse of every card, filling its parent.
  *
  * Drawn in code: a deep-green ground under a tone-on-tone Najdi lattice,
- * a double gold frame with a triangle border, and the 96 emblem at the
- * centre. If a theme supplies `cardBack` artwork that file wins instead.
+ * a double gold frame with a triangle border, and a plain geometric star
+ * at the centre. If a theme supplies `cardBack` artwork that file wins instead.
  */
 export function CardBack() {
   const theme = useTheme()
@@ -84,7 +90,16 @@ export function CardBack() {
           <path d={topBand} fill="var(--color-accent)" opacity="0.7" />
           <path d={bottomBand} fill="var(--color-accent)" opacity="0.7" />
 
-          <Emblem96 x="62" y="112" width="176" height="176" />
+          <polygon
+            points={medallionStar}
+            fill="var(--color-primary-deep)"
+            fillOpacity="0.55"
+            stroke="var(--color-accent)"
+            strokeWidth="3"
+            strokeLinejoin="round"
+          />
+          <circle cx="150" cy="200" r="34" fill="none" stroke="var(--color-accent)" strokeWidth="2" opacity="0.8" />
+          <path d="M150 178l22 22-22 22-22-22z" fill="var(--color-accent)" opacity="0.85" />
         </svg>
       )}
     </div>

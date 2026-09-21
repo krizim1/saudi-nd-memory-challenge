@@ -8,7 +8,7 @@ reload — no component or logic change.
 backgrounds/   attract · gameplay · winner  (.webp, 1920×1080). The registration,
                mode-select and leaderboard screens reuse gameplay.webp.
 cards/         one 3:4 illustration per face id (palm, swords, diriyah …), 900×1200 .webp.
-               The card back is drawn in code (Emblem96); add card-back.webp to override it.
+               The card back is drawn in code; add card-back.webp to override it.
 logos/         logo.svg  (event mark; sponsor marks go in theme.sponsorLogos)
 patterns/      najdi.svg (repeating, tiled at 240×240)
 sounds/        card-flip · match-success · match-wrong · streak · countdown ·
