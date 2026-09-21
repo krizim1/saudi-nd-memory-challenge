@@ -26,6 +26,7 @@ export function LeaderboardProvider({ children, repository }: LeaderboardProvide
 
   const [entries, setEntries] = useState<LeaderboardEntry[]>([])
   const [loading, setLoading] = useState(true)
+  const [recentIds, setRecentIds] = useState<ReadonlySet<string>>(() => new Set())
 
   // `loading` starts true and is only ever cleared: a later refresh keeps
   // the standings on screen instead of flashing an empty board.
@@ -51,7 +52,8 @@ export function LeaderboardProvider({ children, repository }: LeaderboardProvide
   const submit = useCallback(
     async (players: readonly Player[]) => {
       try {
-        await store.addMany(players.map((player) => entryFromPlayer(player)))
+        const added = await store.addMany(players.map((player) => entryFromPlayer(player)))
+        setRecentIds(new Set(added.map((entry) => entry.id)))
       } catch (error) {
         console.warn('[leaderboard] Could not record the round.', error)
       }
@@ -63,6 +65,7 @@ export function LeaderboardProvider({ children, repository }: LeaderboardProvide
   const clear = useCallback(async () => {
     try {
       await store.clear()
+      setRecentIds(new Set())
     } catch (error) {
       console.warn('[leaderboard] Could not clear standings.', error)
     }
@@ -70,8 +73,8 @@ export function LeaderboardProvider({ children, repository }: LeaderboardProvide
   }, [store, refresh])
 
   const api = useMemo<LeaderboardApi>(
-    () => ({ entries, loading, submit, clear, refresh }),
-    [entries, loading, submit, clear, refresh],
+    () => ({ entries, loading, recentIds, submit, clear, refresh }),
+    [entries, loading, recentIds, submit, clear, refresh],
   )
 
   return <LeaderboardContext.Provider value={api}>{children}</LeaderboardContext.Provider>

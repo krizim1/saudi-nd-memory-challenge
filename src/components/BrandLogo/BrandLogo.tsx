@@ -1,5 +1,6 @@
 import { useSettingsStore } from '../../store/settingsStore'
 import { useTheme } from '../../theme/themeContext'
+import { Emblem96 } from '../Emblem96'
 import { useImageAsset } from '../ThemedBackground/useImageAsset'
 
 interface BrandLogoProps {
@@ -7,21 +8,26 @@ interface BrandLogoProps {
   className?: string
   /** Taps are forwarded so the operator gesture can be attached in Phase 6. */
   onPress?: () => void
+  /**
+   * Show the game title beside the emblem. The attract screen turns this
+   * off because it sets the title in large type right beneath the mark.
+   */
+  showTitle?: boolean
 }
 
 const sizeClass = {
   sm: 'h-14 text-xl',
   md: 'h-20 text-3xl',
-  lg: 'h-28 text-5xl',
+  lg: 'h-48 text-5xl',
 } as const
 
 /**
- * The event mark. Until a real logo file exists it renders a typographic
- * lockup built from the configured branding, which is a deliberate
- * fallback rather than an empty box — the attract screen must look
- * finished even on a machine with no assets deployed.
+ * The event mark. A real logo file at `theme.logo` wins; until one is
+ * supplied it renders the 96 emblem with the game title beside it, which
+ * is a deliberate designed fallback rather than an empty box — the attract
+ * screen must look finished on a machine with no assets deployed.
  */
-export function BrandLogo({ size = 'md', className = '', onPress }: BrandLogoProps) {
+export function BrandLogo({ size = 'md', className = '', onPress, showTitle = true }: BrandLogoProps) {
   const theme = useTheme()
   const status = useImageAsset(theme.logo)
   const gameTitle = useSettingsStore((state) => state.gameTitle)
@@ -43,14 +49,10 @@ export function BrandLogo({ size = 'md', className = '', onPress }: BrandLogoPro
     <div
       onClick={onPress}
       aria-label={label}
-      className={`text-display flex items-center gap-3 ${sizeClass[size]} ${className}`}
+      className={`text-display flex items-center gap-4 ${sizeClass[size]} ${className}`}
     >
-      <span
-        aria-hidden
-        className="inline-block h-[0.9em] w-[0.9em] rounded-md border-2 border-accent"
-        style={{ borderStyle: 'solid', transform: 'rotate(45deg)' }}
-      />
-      <span className="leading-none text-text-primary">{gameTitle}</span>
+      <Emblem96 aria-hidden role="presentation" className="h-full w-auto shrink-0 drop-shadow-[0_2px_10px_rgba(216,178,94,0.35)]" />
+      {showTitle && <span className="leading-none text-text-primary">{gameTitle}</span>}
     </div>
   )
 }

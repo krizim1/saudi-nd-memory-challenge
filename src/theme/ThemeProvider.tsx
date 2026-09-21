@@ -2,6 +2,7 @@ import { useEffect, type ReactNode } from 'react'
 
 import { activeTheme } from './theme.config'
 import { themeToCssVariables } from './cssVariables'
+import { preloadThemeImages } from './preload'
 import { ThemeContext } from './themeContext'
 import type { Theme } from './theme.types'
 
@@ -29,6 +30,10 @@ export function ThemeProvider({ theme = activeTheme, children }: ThemeProviderPr
         root.style.removeProperty(name)
       }
     }
+  }, [theme])
+
+  useEffect(() => {
+    preloadThemeImages(theme)
   }, [theme])
 
   return <ThemeContext.Provider value={theme}>{children}</ThemeContext.Provider>

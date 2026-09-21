@@ -54,10 +54,10 @@ export const nationalDayTheme: Theme = {
 
   backgrounds: {
     attract: `${base}/backgrounds/attract.webp`,
-    registration: `${base}/backgrounds/registration.webp`,
+    registration: `${base}/backgrounds/gameplay.webp`,
     gameplay: `${base}/backgrounds/gameplay.webp`,
     winner: `${base}/backgrounds/winner.webp`,
-    leaderboard: `${base}/backgrounds/leaderboard.webp`,
+    leaderboard: `${base}/backgrounds/gameplay.webp`,
   },
 
   pattern: `${base}/patterns/najdi.svg`,
@@ -67,25 +67,24 @@ export const nationalDayTheme: Theme = {
    * Twelve faces — two more than Level 3 needs, so the deck can vary its
    * selection between rounds.
    *
-   * These are icon faces: `symbol` names a drawing in
-   * `theme/placeholders.tsx` and is the card's actual content. Adding an
-   * `image` path to an entry switches that one card to real artwork —
-   * the renderer prefers the image and falls back to the icon, so a theme
-   * can be illustrated a card at a time.
+   * Every face ships illustrated artwork (`cards/<id>.webp`, 3:4 to match
+   * the card). `symbol` names the drawn icon in `theme/placeholders.tsx`
+   * that stands in if an image is ever missing or slow, so a bad asset
+   * degrades one card to an icon instead of breaking the board.
    */
   cards: [
-    { id: 'palm', alt: 'نخلة', symbol: 'palm' },
-    { id: 'swords', alt: 'سيفان', symbol: 'swords' },
-    { id: 'diriyah', alt: 'الدرعية', symbol: 'diriyah' },
-    { id: 'najdi-door', alt: 'باب نجدي', symbol: 'door' },
-    { id: 'falcon', alt: 'صقر', symbol: 'falcon' },
-    { id: 'dunes', alt: 'كثبان رملية', symbol: 'dunes' },
-    { id: 'coffee', alt: 'دلة قهوة', symbol: 'coffee' },
-    { id: 'dates', alt: 'تمر', symbol: 'dates' },
-    { id: 'tower', alt: 'برج', symbol: 'tower' },
-    { id: 'star', alt: 'نجمة', symbol: 'star' },
-    { id: 'mosque', alt: 'مسجد', symbol: 'mosque' },
-    { id: 'oud', alt: 'عود', symbol: 'oud' },
+    { id: 'palm', image: `${base}/cards/palm.webp`, alt: 'نخلة', symbol: 'palm' },
+    { id: 'swords', image: `${base}/cards/swords.webp`, alt: 'سيفان', symbol: 'swords' },
+    { id: 'diriyah', image: `${base}/cards/diriyah.webp`, alt: 'الدرعية', symbol: 'diriyah' },
+    { id: 'najdi-door', image: `${base}/cards/najdi-door.webp`, alt: 'باب نجدي', symbol: 'door' },
+    { id: 'falcon', image: `${base}/cards/falcon.webp`, alt: 'صقر', symbol: 'falcon' },
+    { id: 'dunes', image: `${base}/cards/dunes.webp`, alt: 'كثبان رملية', symbol: 'dunes' },
+    { id: 'coffee', image: `${base}/cards/coffee.webp`, alt: 'دلة قهوة', symbol: 'coffee' },
+    { id: 'dates', image: `${base}/cards/dates.webp`, alt: 'تمر', symbol: 'dates' },
+    { id: 'tower', image: `${base}/cards/tower.webp`, alt: 'برج المملكة', symbol: 'tower' },
+    { id: 'fireworks', image: `${base}/cards/fireworks.webp`, alt: 'ألعاب نارية', symbol: 'star' },
+    { id: 'mosque', image: `${base}/cards/mosque.webp`, alt: 'مسجد', symbol: 'mosque' },
+    { id: 'oud', image: `${base}/cards/oud.webp`, alt: 'عود', symbol: 'oud' },
   ],
 
   sounds: {

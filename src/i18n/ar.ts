@@ -115,11 +115,16 @@ export const ar = {
 
   leaderboard: {
     title: 'أفضل المتسابقين',
+    subtitle: 'لوحة الشرف',
     rank: 'الترتيب',
     name: 'الاسم',
     score: 'النقاط',
     time: 'الوقت',
     empty: 'لا توجد نتائج بعد',
+    emptyHint: 'كن أول من يسجّل اسمه في لوحة الشرف',
+    champion: 'البطل',
+    latest: 'جولتك',
+    participants: (n: number) => `${n} مشارك`,
   },
 
   admin: {

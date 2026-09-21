@@ -44,17 +44,17 @@ export function AttractScreen() {
             adminTap()
           }}
         >
-          <BrandLogo size="lg" />
+          <BrandLogo size="lg" showTitle={false} />
         </span>
 
-        <div className="space-y-6">
+        <div className="space-y-6 [text-shadow:0_2px_18px_rgba(0,0,0,0.8),0_0_4px_rgba(0,0,0,0.5)]">
           <h1 className="text-display text-[clamp(3rem,9vw,8rem)] leading-[1.05] text-text-primary">
             {gameTitle}
           </h1>
           <p className="text-display text-[clamp(1.5rem,3vw,2.75rem)] text-accent">
             {eventTitle}
           </p>
-          <p className="text-2xl text-text-secondary">{tagline}</p>
+          <p className="text-3xl text-text-primary/90">{tagline}</p>
         </div>
 
         <TouchButton size="xl" onClick={start}>

@@ -30,7 +30,7 @@ export function ScreenLayout({ background, scrim = 'soft', children }: ScreenLay
         transition={{ duration: 0.35, ease: 'easeOut' }}
         className="flex h-full w-full flex-col"
       >
-        <header className="flex shrink-0 items-center justify-between px-12 pt-10">
+        <header className="flex shrink-0 items-center justify-between px-24 pt-12">
           <BrandLogo size="sm" onPress={adminTap} />
           <span className="text-lg tracking-wide text-text-secondary">
             {eventTitle}

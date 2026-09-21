@@ -99,6 +99,27 @@ describe('event features', () => {
       expect(names).toEqual(['أول', 'ثاني'])
     })
 
+    it('spotlights the players from the round just played', async () => {
+      const repository = new MemoryLeaderboardRepository(100)
+      await repository.add({
+        playerName: 'قديم',
+        score: 100,
+        totalTime: 200,
+        date: '2026-09-01T10:00:00.000Z',
+      })
+      finishChallenge('results')
+
+      render(<App leaderboardRepository={repository} />)
+      await act(async () => {})
+      act(() => {
+        useGameStore.setState({ phase: 'leaderboard' })
+      })
+      await act(async () => {})
+
+      // Two players just finished; the older entry is not marked.
+      expect(screen.getAllByText(t.leaderboard.latest)).toHaveLength(2)
+    })
+
     it('shows the empty state when nothing has been recorded', async () => {
       useGameStore.setState({ phase: 'leaderboard' })
       render(<App leaderboardRepository={new MemoryLeaderboardRepository(100)} />)
