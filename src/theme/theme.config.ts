@@ -27,29 +27,35 @@ export const nationalDayTheme: Theme = {
   id: 'national-day',
   name: 'اليوم الوطني السعودي',
 
+  /*
+   * Colours are the National Day 96 guideline's own (§3.1 and page 25):
+   * the deep teal ground the whole guideline is set on, the logo's green,
+   * and the authenticity trait green as the bright accent.
+   */
   palette: {
-    primary: '#0F6A3F',
-    primaryDeep: '#06331E',
-    primaryBright: '#17A05C',
-    accent: '#D8B25E',
-    accentDeep: '#8A6A22',
-    background: '#04180F',
-    surface: 'rgba(255, 255, 255, 0.06)',
-    surfaceRaised: 'rgba(255, 255, 255, 0.12)',
-    textPrimary: '#F5F3EC',
-    textSecondary: 'rgba(245, 243, 236, 0.68)',
-    textInverse: '#06331E',
-    success: '#3FBE7C',
-    danger: '#D3574F',
+    primary: '#00894A',
+    primaryDeep: '#00343A',
+    primaryBright: '#5ABA1C',
+    accent: '#5ABA1C',
+    accentDeep: '#00894A',
+    background: '#002628',
+    surface: 'rgba(255, 255, 255, 0.05)',
+    surfaceRaised: 'rgba(255, 255, 255, 0.1)',
+    textPrimary: '#FFFFFF',
+    textSecondary: 'rgba(255, 255, 255, 0.66)',
+    textInverse: '#002628',
+    success: '#5ABA1C',
+    danger: '#971A4D',
   },
 
+  /* IBM Plex Sans Arabic is the identity's secondary typeface (§3.1). */
   typography: {
-    display:
-      '"Noto Kufi Arabic", "Tajawal", "SF Arabic", "Geeza Pro", system-ui, sans-serif',
-    body: '"Tajawal", "Noto Sans Arabic", "SF Arabic", "Geeza Pro", system-ui, sans-serif',
+    display: '"IBM Plex Sans Arabic", "SF Arabic", "Geeza Pro", system-ui, sans-serif',
+    body: '"IBM Plex Sans Arabic", "SF Arabic", "Geeza Pro", system-ui, sans-serif',
   },
 
-  logo: `${base}/logos/logo.svg`,
+  /** The official «عزّنا بطبعنا» artistic logo (guideline §1.2). */
+  logo: `${base}/logos/logo.png`,
   sponsorLogos: [],
 
   backgrounds: {
@@ -64,27 +70,28 @@ export const nationalDayTheme: Theme = {
   cardBack: `${base}/cards/card-back.webp`,
 
   /**
-   * Twelve faces — two more than Level 3 needs, so the deck can vary its
-   * selection between rounds.
+   * Twelve faces from the identity's six traits (guideline §5.2): each
+   * trait's main icon, and its first secondary pattern. Both are the
+   * official artwork, cropped square from the guideline; `color` is the
+   * trait's own HEX from page 25.
    *
-   * Every face ships illustrated artwork (`cards/<id>.webp`, 3:4 to match
-   * the card). `symbol` names the drawn icon in `theme/placeholders.tsx`
-   * that stands in if an image is ever missing or slow, so a bad asset
-   * degrades one card to an icon instead of breaking the board.
+   * `symbol` names the drawn icon in `theme/placeholders.tsx` that stands
+   * in if an image is ever missing, so a bad asset degrades one card to an
+   * icon instead of breaking the board.
    */
   cards: [
-    { id: 'palm', image: `${base}/cards/palm.webp`, alt: 'نخلة', symbol: 'palm' },
-    { id: 'swords', image: `${base}/cards/swords.webp`, alt: 'سيفان', symbol: 'swords' },
-    { id: 'diriyah', image: `${base}/cards/diriyah.webp`, alt: 'الدرعية', symbol: 'diriyah' },
-    { id: 'najdi-door', image: `${base}/cards/najdi-door.webp`, alt: 'باب نجدي', symbol: 'door' },
-    { id: 'falcon', image: `${base}/cards/falcon.webp`, alt: 'صقر', symbol: 'falcon' },
-    { id: 'dunes', image: `${base}/cards/dunes.webp`, alt: 'كثبان رملية', symbol: 'dunes' },
-    { id: 'coffee', image: `${base}/cards/coffee.webp`, alt: 'دلة قهوة', symbol: 'coffee' },
-    { id: 'dates', image: `${base}/cards/dates.webp`, alt: 'تمر', symbol: 'dates' },
-    { id: 'tower', image: `${base}/cards/tower.webp`, alt: 'برج المملكة', symbol: 'tower' },
-    { id: 'fireworks', image: `${base}/cards/fireworks.webp`, alt: 'ألعاب نارية', symbol: 'star' },
-    { id: 'mosque', image: `${base}/cards/mosque.webp`, alt: 'مسجد', symbol: 'mosque' },
-    { id: 'oud', image: `${base}/cards/oud.webp`, alt: 'عود', symbol: 'oud' },
+    { id: 'vision', image: `${base}/cards/vision.webp`, alt: 'عزّنا برؤيتنا', color: '#7C5D21', symbol: 'star' },
+    { id: 'courage', image: `${base}/cards/courage.webp`, alt: 'عزّنا بشجاعتنا', color: '#607C4F', symbol: 'swords' },
+    { id: 'determination', image: `${base}/cards/determination.webp`, alt: 'عزّنا بهمّتنا', color: '#971A4D', symbol: 'dunes' },
+    { id: 'authenticity', image: `${base}/cards/authenticity.webp`, alt: 'عزّنا بأصالتنا', color: '#5ABA1C', symbol: 'palm' },
+    { id: 'generosity', image: `${base}/cards/generosity.webp`, alt: 'عزّنا بكرمنا', color: '#0050AF', symbol: 'coffee' },
+    { id: 'giving', image: `${base}/cards/giving.webp`, alt: 'عزّنا بجودنا', color: '#6565E0', symbol: 'oud' },
+    { id: 'vision-pattern', image: `${base}/cards/vision-pattern.webp`, alt: 'نقش الرؤية', color: '#7C5D21', symbol: 'diriyah' },
+    { id: 'courage-pattern', image: `${base}/cards/courage-pattern.webp`, alt: 'نقش الشجاعة', color: '#607C4F', symbol: 'door' },
+    { id: 'determination-pattern', image: `${base}/cards/determination-pattern.webp`, alt: 'نقش الهمّة', color: '#971A4D', symbol: 'falcon' },
+    { id: 'authenticity-pattern', image: `${base}/cards/authenticity-pattern.webp`, alt: 'نقش الأصالة', color: '#5ABA1C', symbol: 'dates' },
+    { id: 'generosity-pattern', image: `${base}/cards/generosity-pattern.webp`, alt: 'نقش الكرم', color: '#0050AF', symbol: 'mosque' },
+    { id: 'giving-pattern', image: `${base}/cards/giving-pattern.webp`, alt: 'نقش الجود', color: '#6565E0', symbol: 'tower' },
   ],
 
   sounds: {

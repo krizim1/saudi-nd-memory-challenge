@@ -32,7 +32,7 @@ export function AttractScreen() {
   }, [unlock, chooseMode])
 
   return (
-    <ThemedBackground slot="attract" scrim="soft">
+    <ThemedBackground slot="attract" scrim="none">
       <div
         onClick={start}
         className="flex h-full w-full flex-col items-center justify-center gap-12 px-12 text-center"

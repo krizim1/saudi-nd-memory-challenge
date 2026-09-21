@@ -17,7 +17,7 @@ interface BrandLogoProps {
 const sizeClass = {
   sm: 'h-14 text-xl',
   md: 'h-20 text-3xl',
-  lg: 'h-28 text-5xl',
+  lg: 'h-44 text-5xl',
 } as const
 
 /**

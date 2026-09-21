@@ -51,6 +51,8 @@ export interface CardFace {
   alt: string
   /** Inline SVG placeholder key used when `image` is absent or fails. */
   symbol?: string
+  /** Optional accent colour for the card's frame and label strip. */
+  color?: string
 }
 
 /** A single card instance on the board (each pair is dealt twice). */

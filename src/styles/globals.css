@@ -9,22 +9,22 @@
  * active theme without a rebuild.
  */
 @theme {
-  --color-primary: #0f6a3f;
-  --color-primary-deep: #06331e;
-  --color-primary-bright: #17a05c;
-  --color-accent: #d8b25e;
-  --color-accent-deep: #8a6a22;
-  --color-background: #04180f;
-  --color-surface: rgba(255, 255, 255, 0.06);
-  --color-surface-raised: rgba(255, 255, 255, 0.12);
-  --color-text-primary: #f5f3ec;
-  --color-text-secondary: rgba(245, 243, 236, 0.68);
-  --color-text-inverse: #06331e;
-  --color-success: #3fbe7c;
-  --color-danger: #d3574f;
+  --color-primary: #00894a;
+  --color-primary-deep: #00343a;
+  --color-primary-bright: #5aba1c;
+  --color-accent: #5aba1c;
+  --color-accent-deep: #00894a;
+  --color-background: #002628;
+  --color-surface: rgba(255, 255, 255, 0.05);
+  --color-surface-raised: rgba(255, 255, 255, 0.1);
+  --color-text-primary: #ffffff;
+  --color-text-secondary: rgba(255, 255, 255, 0.66);
+  --color-text-inverse: #002628;
+  --color-success: #5aba1c;
+  --color-danger: #971a4d;
 
-  --font-display: 'Noto Kufi Arabic', 'Tajawal', 'SF Arabic', 'Geeza Pro', system-ui, sans-serif;
-  --font-body: 'Tajawal', 'Noto Sans Arabic', 'SF Arabic', 'Geeza Pro', system-ui, sans-serif;
+  --font-display: 'IBM Plex Sans Arabic', 'SF Arabic', 'Geeza Pro', system-ui, sans-serif;
+  --font-body: 'IBM Plex Sans Arabic', 'SF Arabic', 'Geeza Pro', system-ui, sans-serif;
 
   /* Smallest touch target the brief allows. */
   --spacing-touch: 4rem;

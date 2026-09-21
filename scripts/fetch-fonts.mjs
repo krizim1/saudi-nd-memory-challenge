@@ -29,10 +29,10 @@ const cssOut = resolve(root, 'src/theme/fonts.css')
 const UA =
   'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0 Safari/537.36'
 
-const FAMILIES = [
-  { slug: 'noto-kufi-arabic', query: 'Noto+Kufi+Arabic:wght@400;700' },
-  { slug: 'tajawal', query: 'Tajawal:wght@400;500;700' },
-]
+// IBM Plex Sans Arabic is the National Day 96 identity's secondary
+// typeface (guideline §3.1). The primary, Saudi Font, is not openly
+// licensed; add it here once the event is supplied with a web copy.
+const FAMILIES = [{ slug: 'ibm-plex-sans-arabic', query: 'IBM+Plex+Sans+Arabic:wght@400;500;700' }]
 
 /** Subsets worth shipping. Anything else is dropped to keep the build small. */
 const KEEP_SUBSETS = new Set(['arabic', 'latin'])
@@ -96,7 +96,7 @@ for (const { slug, query } of FAMILIES) {
 
 await writeFile(
   resolve(fontsDir, 'OFL.txt'),
-  await get('https://raw.githubusercontent.com/google/fonts/main/ofl/tajawal/OFL.txt'),
+  await get('https://raw.githubusercontent.com/google/fonts/main/ofl/ibmplexsansarabic/OFL.txt'),
 )
 console.log('  OFL.txt')
 

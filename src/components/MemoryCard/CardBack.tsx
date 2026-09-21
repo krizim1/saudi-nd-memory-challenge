@@ -1,105 +1,70 @@
 import { useTheme } from '../../theme/themeContext'
 import { useImageAsset } from '../ThemedBackground/useImageAsset'
 
-/** Small Najdi triangles marching along one edge. */
-function triangleBand(y: number, pointing: 'down' | 'up'): string {
-  const height = pointing === 'down' ? 11 : -11
-  const segments: string[] = []
-  for (let x = 34; x < 266; x += 14) {
-    segments.push(`M${x} ${y}l7 ${height}l7 ${-height}z`)
+const W = 300
+const H = 400
+const CELL = 20
+
+/** Checkerboard of the logo's inner field: two teals, alternating. */
+const checker = (() => {
+  const cells: string[] = []
+  for (let y = 0; y < H; y += CELL) {
+    for (let x = (y / CELL) % 2 === 0 ? 0 : CELL; x < W; x += CELL * 2) {
+      cells.push(`M${x} ${y}h${CELL}v${CELL}h-${CELL}z`)
+    }
   }
-  return segments.join('')
-}
+  return cells.join('')
+})()
 
-/** Eight-point star, centred on (150, 200). */
-const medallionStar = Array.from({ length: 16 }, (_, i) => {
-  const radius = i % 2 === 0 ? 78 : 54
-  const angle = (Math.PI * i) / 8 - Math.PI / 2
-  return `${(150 + radius * Math.cos(angle)).toFixed(1)},${(200 + radius * Math.sin(angle)).toFixed(1)}`
-}).join(' ')
+/** The logo frame's notched edge: small squares stepping along each side. */
+const notches = (() => {
+  const marks: string[] = []
+  for (let x = 20; x < W - 20; x += 16) marks.push(`M${x} 14h6v6h-6z`, `M${x} ${H - 20}h6v6h-6z`)
+  for (let y = 20; y < H - 20; y += 16) marks.push(`M14 ${y}h6v6h-6z`, `M${W - 20} ${y}h6v6h-6z`)
+  return marks.join('')
+})()
 
-const topBand = triangleBand(34, 'down')
-const bottomBand = triangleBand(366, 'up')
+/** A stepped diamond of green squares — the logo's corner motif, centred. */
+const diamond = (() => {
+  const marks: string[] = []
+  const size = 4
+  for (let row = -size; row <= size; row += 1) {
+    const span = size - Math.abs(row)
+    for (let col = -span; col <= span; col += 2) {
+      marks.push(`M${150 + col * CELL - CELL / 2} ${200 + row * CELL - CELL / 2}h${CELL}v${CELL}h-${CELL}z`)
+    }
+  }
+  return marks.join('')
+})()
 
 /**
  * The reverse of every card, filling its parent.
  *
- * Drawn in code: a deep-green ground under a tone-on-tone Najdi lattice,
- * a double gold frame with a triangle border, and a plain geometric star
- * at the centre. If a theme supplies `cardBack` artwork that file wins instead.
+ * Built from the «عزّنا بطبعنا» logo's own vocabulary — the dark teal
+ * checker field, the green notched frame, and its stepped green squares —
+ * so the board reads as part of the identity without reusing the logo
+ * itself on every card. A `cardBack` image in the theme overrides it.
  */
 export function CardBack() {
   const theme = useTheme()
   const status = useImageAsset(theme.cardBack)
 
   return (
-    <div className="absolute inset-0 overflow-hidden rounded-2xl border border-accent/40">
-      <div
-        aria-hidden
-        className="absolute inset-0"
-        style={{
-          background: `radial-gradient(90% 70% at 50% 40%, ${theme.palette.primaryBright} 0%, ${theme.palette.primary} 42%, ${theme.palette.primaryDeep} 100%)`,
-        }}
-      />
-
+    <div className="absolute inset-0 overflow-hidden rounded-2xl bg-background">
       {status === 'ready' ? (
         <img src={theme.cardBack} alt="" className="absolute inset-0 h-full w-full object-cover" />
       ) : (
         <svg
           aria-hidden
-          viewBox="0 0 300 400"
+          viewBox={`0 0 ${W} ${H}`}
           preserveAspectRatio="xMidYMid slice"
           className="absolute inset-0 h-full w-full"
         >
-          <defs>
-            <pattern id="card-back-lattice" width="30" height="30" patternUnits="userSpaceOnUse">
-              <path
-                d="M15 2l13 13-13 13L2 15z"
-                fill="none"
-                stroke="var(--color-accent)"
-                strokeWidth="0.8"
-                opacity="0.16"
-              />
-            </pattern>
-          </defs>
-
-          <rect width="300" height="400" fill="url(#card-back-lattice)" />
-
-          <rect
-            x="12"
-            y="12"
-            width="276"
-            height="376"
-            rx="18"
-            fill="none"
-            stroke="var(--color-accent)"
-            strokeWidth="3"
-          />
-          <rect
-            x="22"
-            y="22"
-            width="256"
-            height="356"
-            rx="12"
-            fill="none"
-            stroke="var(--color-accent)"
-            strokeWidth="1"
-            opacity="0.55"
-          />
-
-          <path d={topBand} fill="var(--color-accent)" opacity="0.7" />
-          <path d={bottomBand} fill="var(--color-accent)" opacity="0.7" />
-
-          <polygon
-            points={medallionStar}
-            fill="var(--color-primary-deep)"
-            fillOpacity="0.55"
-            stroke="var(--color-accent)"
-            strokeWidth="3"
-            strokeLinejoin="round"
-          />
-          <circle cx="150" cy="200" r="34" fill="none" stroke="var(--color-accent)" strokeWidth="2" opacity="0.8" />
-          <path d="M150 178l22 22-22 22-22-22z" fill="var(--color-accent)" opacity="0.85" />
+          <rect width={W} height={H} fill="var(--color-background)" />
+          <path d={checker} fill="var(--color-primary-deep)" />
+          <path d={diamond} fill="var(--color-primary)" />
+          <rect x="4" y="4" width={W - 8} height={H - 8} rx="14" fill="none" stroke="var(--color-primary)" strokeWidth="8" />
+          <path d={notches} fill="var(--color-primary)" />
         </svg>
       )}
     </div>
