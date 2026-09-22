@@ -17,7 +17,24 @@ export interface LeaderboardRepository {
   add(entry: NewLeaderboardEntry): Promise<LeaderboardEntry>
   /** Adds several entries as one operation. */
   addMany(entries: NewLeaderboardEntry[]): Promise<LeaderboardEntry[]>
-  clear(): Promise<void>
+  /**
+   * Removes every entry. A shared store needs the client's `pin`, and
+   * rejects with `ClearRejectedError` when it is wrong.
+   */
+  clear(pin?: string): Promise<void>
+  /** True when `clear` needs a PIN (a shared database). */
+  readonly requiresPin?: boolean
+}
+
+/** A reset refused by the store — distinct from the store being unreachable. */
+export class ClearRejectedError extends Error {
+  readonly reason: 'invalid-pin' | 'locked'
+
+  constructor(reason: 'invalid-pin' | 'locked') {
+    super(`Leaderboard reset rejected: ${reason}`)
+    this.name = 'ClearRejectedError'
+    this.reason = reason
+  }
 }
 
 /**

@@ -2,6 +2,8 @@ import { createContext, useContext } from 'react'
 
 import type { LeaderboardEntry, Player } from '../game/types'
 
+export type ClearResult = 'cleared' | 'invalid-pin' | 'locked' | 'failed'
+
 export interface LeaderboardApi {
   entries: LeaderboardEntry[]
   loading: boolean
@@ -9,7 +11,10 @@ export interface LeaderboardApi {
   recentIds: ReadonlySet<string>
   /** Records finished players and refreshes the standings. */
   submit: (players: readonly Player[]) => Promise<void>
-  clear: () => Promise<void>
+  /** Clears the standings; a shared database needs the client's PIN. */
+  clear: (pin?: string) => Promise<ClearResult>
+  /** True when clearing needs a PIN. */
+  requiresPin: boolean
   refresh: () => Promise<void>
 }
 
@@ -22,7 +27,8 @@ export const LeaderboardContext = createContext<LeaderboardApi>({
   loading: false,
   recentIds: new Set<string>(),
   submit: async () => {},
-  clear: async () => {},
+  clear: async () => 'cleared',
+  requiresPin: false,
   refresh: async () => {},
 })
 

@@ -97,8 +97,8 @@ level-complete screen shows every part.
 By default standings live in the browser (IndexedDB). To share one
 ranking across kiosks and the published site:
 
-1. Create a free project at supabase.com and run `supabase/schema.sql`
-   in its SQL editor.
+1. Create a free project at supabase.com and run `supabase/schema.sql`,
+   then `supabase/migrations/002_clients.sql`, in its SQL editor.
 2. Copy *Project URL* and the *anon public* key from Project Settings → API.
 3. Locally: put them in `.env.local` (see `.env.example`).
    For GitHub Pages: add them as repository **variables**
@@ -108,7 +108,31 @@ The table allows reading and inserting only, so the public key cannot
 edit or delete results; clear the table from the Supabase dashboard. If
 the network drops, the game keeps playing and holds results in memory.
 
-## Running the event
+## Clients: one game, separate leaderboards
+
+Every result is tagged with the client in the URL:
+
+    https://krizim1.github.io/saudi-nd-memory-challenge/?client=byd
+
+With no `?client=` the game uses `default`. Each client sees only its
+own standings.
+
+Register a client (and its reset PIN) once, in the Supabase SQL editor
+— no code change or redeploy needed:
+
+```sql
+select public.add_client('byd', 'BYD', 'a-6+-char-PIN',
+                         'احتفال BYD باليوم الوطني',            -- event title (optional)
+                         'https://example.com/byd-logo.png');   -- logo URL (optional)
+```
+
+Running it again updates the name, title, logo or PIN. To clear a
+client's standings, open the operator panel (five taps on the logo),
+enter the PIN and tap *مسح لوحة المتصدرين* twice. Five wrong PINs lock
+that client's reset for 15 minutes. From the SQL editor you can also
+clear directly: `delete from public.leaderboard where client = 'byd';`
+
+
 
 1. `npm run build`, then serve `dist/` and open it in a kiosk-mode
    browser on the touchscreen.

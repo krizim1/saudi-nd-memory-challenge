@@ -4,7 +4,9 @@ import { motion } from 'framer-motion'
 import { useAdminGesture } from '../admin/useAdminGesture'
 import { config } from '../app/config'
 import { useAudio } from '../audio/audioContext'
+import { useEventTitle } from '../client/clientContext'
 import { BrandLogo } from '../components/BrandLogo'
+import { ClientLogo } from '../components/ClientLogo'
 import { ThemedBackground } from '../components/ThemedBackground'
 import { TouchButton } from '../components/TouchButton'
 import { t } from '../i18n'
@@ -21,7 +23,7 @@ export function AttractScreen() {
   const showLeaderboard = useGameStore((state) => state.showLeaderboard)
   const { unlock } = useAudio()
   const gameTitle = useSettingsStore((state) => state.gameTitle)
-  const eventTitle = useSettingsStore((state) => state.eventTitle)
+  const eventTitle = useEventTitle()
   const leaderboardEnabled = useSettingsStore((state) => state.showLeaderboard)
   const tagline = config.branding.tagline
   const adminTap = useAdminGesture()
@@ -37,8 +39,11 @@ export function AttractScreen() {
     <ThemedBackground slot="attract" scrim="none">
       <div
         onClick={start}
-        className="flex h-full w-full flex-col items-center justify-center gap-12 px-12 text-center"
+        className="relative flex h-full w-full flex-col items-center justify-center gap-12 px-12 text-center"
       >
+        {/* Partner mark: top-left, opposite the National Day logo (§1.7). */}
+        <ClientLogo className="absolute top-12 left-24 h-20 max-w-72" />
+
         {/* The gesture must not also start a game, so the tap stops here. */}
         <span
           onClick={(event) => {

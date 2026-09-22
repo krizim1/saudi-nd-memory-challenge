@@ -29,14 +29,16 @@ export class IndexedDbLeaderboardRepository implements LeaderboardRepository {
   private db: Promise<IDBDatabase> | null = null
 
   private readonly storageLimit: number
+  private readonly dbName: string
 
-  constructor(storageLimit: number) {
+  constructor(storageLimit: number, dbName: string = DB_NAME) {
     this.storageLimit = storageLimit
+    this.dbName = dbName
   }
 
   private open(): Promise<IDBDatabase> {
     this.db ??= new Promise<IDBDatabase>((resolve, reject) => {
-      const request = indexedDB.open(DB_NAME, DB_VERSION)
+      const request = indexedDB.open(this.dbName, DB_VERSION)
 
       request.onupgradeneeded = () => {
         const db = request.result

@@ -1,6 +1,7 @@
 import { config } from '../app/config'
+import { DEFAULT_CLIENT, getClientId } from '../client/clientId'
 import { IndexedDbLeaderboardRepository } from './indexedDbLeaderboardRepository'
-import type { LeaderboardRepository } from './leaderboardRepository'
+import { ClearRejectedError, type LeaderboardRepository } from './leaderboardRepository'
 import { MemoryLeaderboardRepository } from './memoryLeaderboardRepository'
 import { SupabaseLeaderboardRepository } from './supabaseLeaderboardRepository'
 
@@ -13,11 +14,12 @@ import { SupabaseLeaderboardRepository } from './supabaseLeaderboardRepository'
  */
 export function createRemoteLeaderboardRepository(
   storageLimit: number = config.leaderboard.storageLimit,
+  client: string = getClientId(),
 ): LeaderboardRepository | null {
   const url = import.meta.env.VITE_SUPABASE_URL as string | undefined
   const key = import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined
   if (!url || !key) return null
-  return new SupabaseLeaderboardRepository(url, key, storageLimit)
+  return new SupabaseLeaderboardRepository(url, key, storageLimit, client)
 }
 
 /**
@@ -30,12 +32,15 @@ export function createRemoteLeaderboardRepository(
  */
 export function createLeaderboardRepository(
   storageLimit: number = config.leaderboard.storageLimit,
+  client: string = getClientId(),
 ): LeaderboardRepository {
   if (typeof indexedDB === 'undefined') {
     return new MemoryLeaderboardRepository(storageLimit)
   }
 
-  return new IndexedDbLeaderboardRepository(storageLimit)
+  // One local database per client, so clients sharing a machine stay apart.
+  const suffix = client === DEFAULT_CLIENT ? '' : `:${client}`
+  return new IndexedDbLeaderboardRepository(storageLimit, `saudi-memory-challenge${suffix}`)
 }
 
 /**
@@ -62,6 +67,8 @@ export function withMemoryFallback(
   }
 
   return {
+    requiresPin: primary.requiresPin,
+
     async list(limit) {
       if (degraded) return fallback.list(limit)
       try {
@@ -89,11 +96,13 @@ export function withMemoryFallback(
       }
     },
 
-    async clear() {
+    async clear(pin) {
       if (degraded) return fallback.clear()
       try {
-        await primary.clear()
+        await primary.clear(pin)
       } catch (error) {
+        // A wrong PIN is an answer, not an outage: report it, stay online.
+        if (error instanceof ClearRejectedError) throw error
         await degradeTo(error).clear()
       }
     },

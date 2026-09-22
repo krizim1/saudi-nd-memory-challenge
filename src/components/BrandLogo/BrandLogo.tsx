@@ -1,3 +1,4 @@
+import { useEventTitle } from '../../client/clientContext'
 import { useSettingsStore } from '../../store/settingsStore'
 import { useTheme } from '../../theme/themeContext'
 import { useImageAsset } from '../ThemedBackground/useImageAsset'
@@ -30,7 +31,7 @@ export function BrandLogo({ size = 'md', className = '', onPress, showTitle = tr
   const theme = useTheme()
   const status = useImageAsset(theme.logo)
   const gameTitle = useSettingsStore((state) => state.gameTitle)
-  const eventTitle = useSettingsStore((state) => state.eventTitle)
+  const eventTitle = useEventTitle()
   const label = `${gameTitle} — ${eventTitle}`
 
   if (status === 'ready') {

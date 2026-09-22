@@ -1,5 +1,5 @@
 -- Shared leaderboard for the Saudi ND memory challenge.
--- Run once in the Supabase SQL editor.
+-- Run once in the Supabase SQL editor, then run migrations/002_clients.sql.
 
 create table if not exists public.leaderboard (
   id              text primary key,

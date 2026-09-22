@@ -2,7 +2,8 @@ import { useState, type ReactNode } from 'react'
 
 import { config } from '../app/config'
 import { levels } from '../game/levels'
-import { useLeaderboard } from '../leaderboard/leaderboardContext'
+import { useClient } from '../client/clientContext'
+import { useLeaderboard, type ClearResult } from '../leaderboard/leaderboardContext'
 import { t } from '../i18n'
 import { useGameStore } from '../store/gameStore'
 import { LIMITS, useSettingsStore } from '../store/settingsStore'
@@ -90,10 +91,13 @@ export function AdminPanel() {
   const setAdminOpen = useGameStore((state) => state.setAdminOpen)
   const resetGame = useGameStore((state) => state.resetGame)
   const jumpToLevel = useGameStore((state) => state.jumpToLevel)
-  const { clear: clearLeaderboard } = useLeaderboard()
+  const { clear: clearLeaderboard, requiresPin } = useLeaderboard()
+  const client = useClient()
 
   const settings = useSettingsStore()
   const [confirmingClear, setConfirmingClear] = useState(false)
+  const [pin, setPin] = useState('')
+  const [clearResult, setClearResult] = useState<ClearResult | null>(null)
 
   const close = () => setAdminOpen(false)
 
@@ -102,13 +106,23 @@ export function AdminPanel() {
       setConfirmingClear(true)
       return
     }
-    void clearLeaderboard()
     setConfirmingClear(false)
+    void clearLeaderboard(requiresPin ? pin : undefined).then((result) => {
+      setClearResult(result)
+      if (result === 'cleared') setPin('')
+    })
+  }
+
+  const clearMessage: Record<ClearResult, string> = {
+    cleared: t.admin.cleared,
+    'invalid-pin': t.admin.invalidPin,
+    locked: t.admin.locked,
+    failed: t.admin.clearFailed,
   }
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 p-8">
-      <div className="flex max-h-full w-full max-w-4xl flex-col gap-6 overflow-y-auto rounded-3xl border border-white/15 bg-[#06331E] p-8">
+      <div className="flex max-h-full w-full max-w-4xl flex-col gap-6 overflow-y-auto rounded-3xl border border-white/15 bg-primary-deep p-8">
         <header className="flex items-center justify-between">
           <h2 className="text-display text-3xl text-text-primary">{t.admin.title}</h2>
           <PanelButton onClick={close}>{t.common.close}</PanelButton>
@@ -129,6 +143,33 @@ export function AdminPanel() {
               {confirmingClear ? t.admin.confirmClear : t.admin.resetLeaderboard}
             </PanelButton>
           </div>
+
+          <Row label={t.admin.client(client.name ?? client.id)}>
+            {requiresPin && (
+              <input
+                type="password"
+                inputMode="numeric"
+                autoComplete="off"
+                aria-label={t.admin.pinLabel}
+                placeholder={t.admin.pinPlaceholder}
+                value={pin}
+                onChange={(event) => {
+                  setPin(event.target.value)
+                  setClearResult(null)
+                }}
+                className="h-14 w-56 rounded-xl border border-white/15 bg-black/30 px-4 text-lg text-text-primary"
+              />
+            )}
+          </Row>
+
+          {clearResult && (
+            <p
+              role="status"
+              className={`text-lg ${clearResult === 'cleared' ? 'text-success' : 'text-danger'}`}
+            >
+              {clearMessage[clearResult]}
+            </p>
+          )}
         </Section>
 
         <Section title={t.admin.audio}>

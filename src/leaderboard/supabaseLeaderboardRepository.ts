@@ -1,5 +1,6 @@
 import type { LeaderboardEntry } from '../game/types'
 import {
+  ClearRejectedError,
   createEntryId,
   rank,
   type LeaderboardRepository,
@@ -9,6 +10,7 @@ import {
 /** Row shape in the `leaderboard` table (see `supabase/schema.sql`). */
 interface Row {
   id: string
+  client?: string
   player_name: string
   score: number
   total_time: number
@@ -33,9 +35,10 @@ function toEntry(row: Row): LeaderboardEntry {
   }
 }
 
-function toRow(entry: NewLeaderboardEntry, id: string): Row {
+function toRow(entry: NewLeaderboardEntry, id: string, client: string): Row {
   return {
     id,
+    client,
     player_name: entry.playerName,
     score: entry.score,
     total_time: entry.totalTime,
@@ -50,20 +53,26 @@ function toRow(entry: NewLeaderboardEntry, id: string): Row {
 /**
  * Shared standings in a Supabase (PostgreSQL) table, over its REST API.
  *
- * Every screen pointed at the same project sees the same leaderboard, so
- * several kiosks — and the published site — share one ranking. The anon
+ * Every screen for the same client shares one ranking — several kiosks
+ * and the published link alike — and each client sees only its own rows. The anon
  * key (publishable or legacy anon) is public by design; the table's row-level security allows reading
  * and inserting only, so a visitor cannot edit or delete results.
  */
 export class SupabaseLeaderboardRepository implements LeaderboardRepository {
+  readonly requiresPin = true
+
+  private readonly base: string
   private readonly endpoint: string
   private readonly key: string
   private readonly storageLimit: number
+  private readonly client: string
 
-  constructor(url: string, anonKey: string, storageLimit: number) {
-    this.endpoint = `${url.replace(/\/+$/, '')}/rest/v1/leaderboard`
+  constructor(url: string, anonKey: string, storageLimit: number, client = 'default') {
+    this.base = `${url.replace(/\/+$/, '')}/rest/v1`
+    this.endpoint = `${this.base}/leaderboard`
     this.key = anonKey
     this.storageLimit = storageLimit
+    this.client = client
   }
 
   private headers(extra: Record<string, string> = {}): HeadersInit {
@@ -80,7 +89,7 @@ export class SupabaseLeaderboardRepository implements LeaderboardRepository {
   async list(limit?: number): Promise<LeaderboardEntry[]> {
     const cap = Math.min(limit ?? this.storageLimit, this.storageLimit)
     // Same order as `compareEntries`: score, then faster time, then earlier.
-    const query = `select=*&order=score.desc,total_time.asc,created_at.asc&limit=${cap}`
+    const query = `select=*&client=eq.${encodeURIComponent(this.client)}&order=score.desc,total_time.asc,created_at.asc&limit=${cap}`
     const response = await fetch(`${this.endpoint}?${query}`, { headers: this.headers() })
     if (!response.ok) throw new Error(`Supabase list failed: ${response.status}`)
     return rank(((await response.json()) as Row[]).map(toEntry))
@@ -93,7 +102,7 @@ export class SupabaseLeaderboardRepository implements LeaderboardRepository {
 
   async addMany(entries: NewLeaderboardEntry[]): Promise<LeaderboardEntry[]> {
     if (entries.length === 0) return []
-    const rows = entries.map((entry) => toRow(entry, createEntryId()))
+    const rows = entries.map((entry) => toRow(entry, createEntryId(), this.client))
     const response = await fetch(this.endpoint, {
       method: 'POST',
       headers: this.headers({ Prefer: 'return=minimal' }),
@@ -104,10 +113,19 @@ export class SupabaseLeaderboardRepository implements LeaderboardRepository {
   }
 
   /**
-   * Deleting shared results is deliberately not possible with the public
-   * key. Clear the table from the Supabase dashboard instead.
+   * Clears this client's standings through the `reset_leaderboard`
+   * database function, which checks the client's PIN. The public key can
+   * never delete rows directly.
    */
-  async clear(): Promise<void> {
-    console.warn('[leaderboard] Shared standings are cleared from the Supabase dashboard.')
+  async clear(pin?: string): Promise<void> {
+    const response = await fetch(`${this.base}/rpc/reset_leaderboard`, {
+      method: 'POST',
+      headers: this.headers(),
+      body: JSON.stringify({ p_client: this.client, p_pin: pin ?? '' }),
+    })
+    if (!response.ok) throw new Error(`Supabase reset failed: ${response.status}`)
+    const result = (await response.json()) as number
+    if (result === -2) throw new ClearRejectedError('locked')
+    if (result < 0) throw new ClearRejectedError('invalid-pin')
   }
 }

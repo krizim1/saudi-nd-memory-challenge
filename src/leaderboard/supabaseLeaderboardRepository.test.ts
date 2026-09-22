@@ -1,9 +1,11 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 
+import { withMemoryFallback } from './createLeaderboardRepository'
+import { ClearRejectedError } from './leaderboardRepository'
 import { SupabaseLeaderboardRepository } from './supabaseLeaderboardRepository'
 
 const URL = 'https://example.supabase.co'
-const repo = () => new SupabaseLeaderboardRepository(URL, 'anon-key', 1000)
+const repo = (client = 'byd') => new SupabaseLeaderboardRepository(URL, 'anon-key', 1000, client)
 
 function mockFetch(body: unknown, ok = true) {
   const fn = vi.fn(async () => ({ ok, status: ok ? 200 : 500, json: async () => body }))
@@ -30,6 +32,7 @@ describe('SupabaseLeaderboardRepository', () => {
     expect(url).toContain(`${URL}/rest/v1/leaderboard?`)
     expect(url).toContain('order=score.desc,total_time.asc,created_at.asc')
     expect(url).toContain('limit=10')
+    expect(url).toContain('client=eq.byd')
     expect((init.headers as Record<string, string>).apikey).toBe('anon-key')
   })
 
@@ -47,7 +50,7 @@ describe('SupabaseLeaderboardRepository', () => {
     const [, init] = fetch.mock.calls[0] as unknown as [string, RequestInit]
     expect(init.method).toBe('POST')
     const rows = JSON.parse(init.body as string)
-    expect(rows[0]).toMatchObject({ player_name: 'عبدالله', score: 8420, total_time: 120, matches: 24 })
+    expect(rows[0]).toMatchObject({ client: 'byd', player_name: 'عبدالله', score: 8420, total_time: 120, matches: 24 })
     expect(rows[1].matches).toBeNull()
   })
 
@@ -67,5 +70,28 @@ describe('SupabaseLeaderboardRepository', () => {
     mockFetch(null, false)
     await expect(repo().list()).rejects.toThrow()
     await expect(repo().add({ playerName: 'x', score: 1, totalTime: 1, date: 'd' })).rejects.toThrow()
+  })
+
+  it('clears through the PIN-checked database function, for its own client only', async () => {
+    const fetch = mockFetch(12)
+    await repo().clear('123456')
+
+    const [url, init] = fetch.mock.calls[0] as unknown as [string, RequestInit]
+    expect(url).toBe(`${URL}/rest/v1/rpc/reset_leaderboard`)
+    expect(JSON.parse(init.body as string)).toEqual({ p_client: 'byd', p_pin: '123456' })
+  })
+
+  it('reports a wrong PIN and a lock-out as rejections', async () => {
+    mockFetch(-1)
+    await expect(repo().clear('000000')).rejects.toMatchObject({ reason: 'invalid-pin' })
+    mockFetch(-2)
+    await expect(repo().clear('000000')).rejects.toMatchObject({ reason: 'locked' })
+  })
+
+  it('does not fall back to memory on a wrong PIN', async () => {
+    mockFetch(-1)
+    const guarded = withMemoryFallback(repo(), 10)
+    await expect(guarded.clear('000000')).rejects.toBeInstanceOf(ClearRejectedError)
+    expect(guarded.requiresPin).toBe(true)
   })
 })

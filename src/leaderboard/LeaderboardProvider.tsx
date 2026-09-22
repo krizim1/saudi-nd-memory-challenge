@@ -7,8 +7,12 @@ import {
   createRemoteLeaderboardRepository,
   withMemoryFallback,
 } from './createLeaderboardRepository'
-import { entryFromPlayer, type LeaderboardRepository } from './leaderboardRepository'
-import { LeaderboardContext, type LeaderboardApi } from './leaderboardContext'
+import {
+  ClearRejectedError,
+  entryFromPlayer,
+  type LeaderboardRepository,
+} from './leaderboardRepository'
+import { LeaderboardContext, type ClearResult, type LeaderboardApi } from './leaderboardContext'
 
 interface LeaderboardProviderProps {
   children: ReactNode
@@ -68,19 +72,28 @@ export function LeaderboardProvider({ children, repository }: LeaderboardProvide
     [store, refresh],
   )
 
-  const clear = useCallback(async () => {
-    try {
-      await store.clear()
-      setRecentIds(new Set())
-    } catch (error) {
-      console.warn('[leaderboard] Could not clear standings.', error)
-    }
-    await refresh()
-  }, [store, refresh])
+  const clear = useCallback(
+    async (pin?: string): Promise<ClearResult> => {
+      let result: ClearResult = 'cleared'
+      try {
+        await store.clear(pin)
+        setRecentIds(new Set())
+      } catch (error) {
+        if (error instanceof ClearRejectedError) return error.reason
+        console.warn('[leaderboard] Could not clear standings.', error)
+        result = 'failed'
+      }
+      await refresh()
+      return result
+    },
+    [store, refresh],
+  )
+
+  const requiresPin = Boolean(store.requiresPin)
 
   const api = useMemo<LeaderboardApi>(
-    () => ({ entries, loading, recentIds, submit, clear, refresh }),
-    [entries, loading, recentIds, submit, clear, refresh],
+    () => ({ entries, loading, recentIds, submit, clear, requiresPin, refresh }),
+    [entries, loading, recentIds, submit, clear, requiresPin, refresh],
   )
 
   return <LeaderboardContext.Provider value={api}>{children}</LeaderboardContext.Provider>

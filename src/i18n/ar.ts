@@ -157,5 +157,12 @@ export const ar = {
     testLevel: (n: number) => `تجربة المستوى ${n}`,
     restoreDefaults: 'استعادة الإعدادات الافتراضية',
     confirmClear: 'اضغط مرة أخرى للتأكيد',
+    client: (name: string) => `العميل: ${name}`,
+    pinLabel: 'رمز التصفير (PIN)',
+    pinPlaceholder: 'أدخل الرمز',
+    cleared: 'تم تصفير لوحة المتصدرين',
+    invalidPin: 'الرمز غير صحيح',
+    locked: 'محاولات كثيرة — أعد المحاولة بعد ١٥ دقيقة',
+    clearFailed: 'تعذّر الاتصال — لم يتم التصفير',
   },
 } as const

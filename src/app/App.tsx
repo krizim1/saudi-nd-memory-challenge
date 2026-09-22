@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 
 import { AdminPanel } from '../admin/AdminPanel'
 import { AudioProvider } from '../audio/AudioProvider'
+import { ClientProvider } from '../client/ClientProvider'
 import { validateLevels } from '../game/levels'
 import { useKioskReset } from '../hooks/useKioskReset'
 import { LeaderboardProvider } from '../leaderboard/LeaderboardProvider'
@@ -46,13 +47,15 @@ export function App({ leaderboardRepository }: AppProps = {}) {
 
   return (
     <ThemeProvider>
-      <AudioProvider>
-        <LeaderboardProvider repository={leaderboardRepository}>
-          <ErrorBoundary onReset={resetGame}>
-            <GameShell />
-          </ErrorBoundary>
-        </LeaderboardProvider>
-      </AudioProvider>
+      <ClientProvider>
+        <AudioProvider>
+          <LeaderboardProvider repository={leaderboardRepository}>
+            <ErrorBoundary onReset={resetGame}>
+              <GameShell />
+            </ErrorBoundary>
+          </LeaderboardProvider>
+        </AudioProvider>
+      </ClientProvider>
     </ThemeProvider>
   )
 }

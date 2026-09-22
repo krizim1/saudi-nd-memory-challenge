@@ -2,9 +2,10 @@ import { motion } from 'framer-motion'
 import type { ReactNode } from 'react'
 
 import { useAdminGesture } from '../../admin/useAdminGesture'
-import { useSettingsStore } from '../../store/settingsStore'
+import { useEventTitle } from '../../client/clientContext'
 import type { ThemeBackgrounds } from '../../theme/theme.types'
 import { BrandLogo } from '../BrandLogo'
+import { ClientLogo } from '../ClientLogo'
 import { ThemedBackground } from '../ThemedBackground'
 
 interface ScreenLayoutProps {
@@ -19,7 +20,7 @@ interface ScreenLayoutProps {
  * which is what keeps them short enough to read in one pass.
  */
 export function ScreenLayout({ background, scrim = 'soft', children }: ScreenLayoutProps) {
-  const eventTitle = useSettingsStore((state) => state.eventTitle)
+  const eventTitle = useEventTitle()
   const adminTap = useAdminGesture()
 
   return (
@@ -32,9 +33,10 @@ export function ScreenLayout({ background, scrim = 'soft', children }: ScreenLay
       >
         <header className="flex shrink-0 items-center justify-between px-24 pt-12">
           <BrandLogo size="sm" onPress={adminTap} />
-          <span className="text-lg tracking-wide text-text-secondary">
-            {eventTitle}
-          </span>
+          <div className="flex items-center gap-4">
+            <span className="text-lg tracking-wide text-text-secondary">{eventTitle}</span>
+            <ClientLogo className="h-7 max-w-40" />
+          </div>
         </header>
 
         <main className="flex min-h-0 flex-1 flex-col items-center justify-center px-12 py-8">
