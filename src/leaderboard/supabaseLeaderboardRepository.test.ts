@@ -51,6 +51,18 @@ describe('SupabaseLeaderboardRepository', () => {
     expect(rows[1].matches).toBeNull()
   })
 
+  it('sends a publishable key as apikey only, a legacy key as a bearer token too', async () => {
+    const fetch = mockFetch([])
+    await new SupabaseLeaderboardRepository(URL, 'sb_publishable_abc', 10).list()
+    await repo().list()
+
+    const publishable = (fetch.mock.calls[0] as unknown as [string, RequestInit])[1].headers as Record<string, string>
+    const legacy = (fetch.mock.calls[1] as unknown as [string, RequestInit])[1].headers as Record<string, string>
+    expect(publishable.apikey).toBe('sb_publishable_abc')
+    expect(publishable.Authorization).toBeUndefined()
+    expect(legacy.Authorization).toBe('Bearer anon-key')
+  })
+
   it('rejects on a server error so the caller can fall back', async () => {
     mockFetch(null, false)
     await expect(repo().list()).rejects.toThrow()

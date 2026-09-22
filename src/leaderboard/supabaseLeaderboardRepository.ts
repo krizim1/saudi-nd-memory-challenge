@@ -52,7 +52,7 @@ function toRow(entry: NewLeaderboardEntry, id: string): Row {
  *
  * Every screen pointed at the same project sees the same leaderboard, so
  * several kiosks — and the published site — share one ranking. The anon
- * key is public by design; the table's row-level security allows reading
+ * key (publishable or legacy anon) is public by design; the table's row-level security allows reading
  * and inserting only, so a visitor cannot edit or delete results.
  */
 export class SupabaseLeaderboardRepository implements LeaderboardRepository {
@@ -69,7 +69,9 @@ export class SupabaseLeaderboardRepository implements LeaderboardRepository {
   private headers(extra: Record<string, string> = {}): HeadersInit {
     return {
       apikey: this.key,
-      Authorization: `Bearer ${this.key}`,
+      // Legacy anon keys are JWTs and also go in Authorization; the newer
+      // `sb_publishable_…` keys are not JWTs and must be sent as `apikey` only.
+      ...(this.key.startsWith('sb_') ? {} : { Authorization: `Bearer ${this.key}` }),
       'Content-Type': 'application/json',
       ...extra,
     }
