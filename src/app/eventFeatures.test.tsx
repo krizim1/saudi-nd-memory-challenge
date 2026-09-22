@@ -120,6 +120,36 @@ describe('event features', () => {
       expect(screen.getAllByText(t.leaderboard.latest)).toHaveLength(2)
     })
 
+    it('opens the standings from the attract screen without starting a game', async () => {
+      render(<App leaderboardRepository={new MemoryLeaderboardRepository(100)} />)
+      await act(async () => {})
+
+      fireEvent.click(screen.getByText(t.attract.viewLeaderboard))
+      await act(async () => {})
+
+      expect(useGameStore.getState().phase).toBe('leaderboard')
+      expect(useGameStore.getState().players).toHaveLength(0)
+    })
+
+    it('lists every player, not just a top ten', async () => {
+      const repository = new MemoryLeaderboardRepository(100)
+      await repository.addMany(
+        Array.from({ length: 25 }, (_, i) => ({
+          playerName: `لاعب ${i + 1}`,
+          score: 5000 - i * 100,
+          totalTime: 100,
+          date: '2026-09-01T10:00:00.000Z',
+        })),
+      )
+
+      useGameStore.setState({ phase: 'leaderboard' })
+      render(<App leaderboardRepository={repository} />)
+      await act(async () => {})
+
+      expect(screen.getByText('لاعب 25')).not.toBeNull()
+      expect(screen.getByText(t.leaderboard.participants(25))).not.toBeNull()
+    })
+
     it('shows the empty state when nothing has been recorded', async () => {
       useGameStore.setState({ phase: 'leaderboard' })
       render(<App leaderboardRepository={new MemoryLeaderboardRepository(100)} />)

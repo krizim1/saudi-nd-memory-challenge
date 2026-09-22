@@ -74,6 +74,40 @@ levels each, real scores, and a winner.
 
 All six phases are complete.
 
+## Scoring
+
+Each level is scored from what the player controls, then weighted by
+the level (all weights in `src/app/config.ts`):
+
+| Part | Rule |
+|---|---|
+| Matches | 100 per pair |
+| Streak | +25 per consecutive match beyond the first, capped at ×5 |
+| Accuracy | up to 300 × (matches ÷ attempts) × share of board found |
+| Speed | up to 200, full at ≤1.5 s per attempt, zero at ≥5 s, × share found |
+| Time | 10 per second left — cleared levels only |
+| Clear | +200 for finishing the board |
+| Level | subtotal × 1 / × 1.5 / × 2 for levels 1–3 |
+
+Wrong flips never subtract; they only lower the accuracy bonus. The
+level-complete screen shows every part.
+
+## Shared leaderboard (Supabase)
+
+By default standings live in the browser (IndexedDB). To share one
+ranking across kiosks and the published site:
+
+1. Create a free project at supabase.com and run `supabase/schema.sql`
+   in its SQL editor.
+2. Copy *Project URL* and the *anon public* key from Project Settings → API.
+3. Locally: put them in `.env.local` (see `.env.example`).
+   For GitHub Pages: add them as repository **variables**
+   `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY`, then re-run Deploy.
+
+The table allows reading and inserting only, so the public key cannot
+edit or delete results; clear the table from the Supabase dashboard. If
+the network drops, the game keeps playing and holds results in memory.
+
 ## Running the event
 
 1. `npm run build`, then serve `dist/` and open it in a kiosk-mode

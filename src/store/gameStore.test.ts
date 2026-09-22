@@ -11,7 +11,17 @@ const result = (overrides: Partial<LevelResult> = {}): LevelResult => ({
   matches: 4,
   attempts: 6,
   bestStreak: 2,
-  breakdown: { matchScore: 100, streakBonus: 0, timeBonus: 0, total: 100 },
+  breakdown: {
+    matchScore: 100,
+    streakBonus: 0,
+    accuracyBonus: 0,
+    speedBonus: 0,
+    timeBonus: 0,
+    clearBonus: 0,
+    subtotal: 100,
+    multiplier: 1,
+    total: 100,
+  },
   ...overrides,
 })
 

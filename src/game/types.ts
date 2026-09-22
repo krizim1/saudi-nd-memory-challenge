@@ -79,6 +79,8 @@ export interface LevelConfig {
   pairs: number
   /** Seconds allowed for the level. */
   timeLimit: number
+  /** Difficulty weight applied to the level's score (×1, ×1.5, ×2 …); defaults to 1. */
+  scoreMultiplier?: number
 }
 
 /**
@@ -86,12 +88,22 @@ export interface LevelConfig {
  * screen can show the player where their points came from (section 7).
  */
 export interface ScoreBreakdown {
-  /** Flat points for the pairs found. */
+  /** Performance: flat points for the pairs found. */
   matchScore: number
-  /** Accumulated bonus for consecutive matches. */
+  /** Performance: accumulated bonus for consecutive matches. */
   streakBonus: number
-  /** Awarded from the seconds left on a cleared level. */
+  /** Performance: share of attempts that were matches. */
+  accuracyBonus: number
+  /** Speed: how quickly each attempt was made. */
+  speedBonus: number
+  /** Time: awarded from the seconds left on a cleared level. */
   timeBonus: number
+  /** Time: flat bonus for clearing the board. */
+  clearBonus: number
+  /** Sum of the components before the level weight. */
+  subtotal: number
+  /** Level: difficulty weight applied to the subtotal. */
+  multiplier: number
   total: number
 }
 
@@ -126,6 +138,15 @@ export interface LeaderboardEntry {
   totalTime: number
   /** ISO 8601 timestamp. */
   date: string
+  /**
+   * Performance detail. Optional because rows recorded before these were
+   * tracked do not have them; the board shows a dash instead.
+   */
+  matches?: number
+  attempts?: number
+  bestStreak?: number
+  /** Levels the player cleared, out of the levels played. */
+  levelsCleared?: number
 }
 
 /** Outcome of comparing both players once the challenge ends. */

@@ -17,6 +17,16 @@ export interface ScoringConfig {
   maxStreakMultiplier: number
   /** Points per remaining second when a level is cleared. */
   timeBonusPerSecond: number
+  /** Flat bonus for clearing a level's board. */
+  clearBonus: number
+  /** Accuracy bonus for a perfect memory on a cleared board. */
+  accuracyBonusMax: number
+  /** Speed bonus for flipping at or under `speedFastSeconds` per attempt. */
+  speedBonusMax: number
+  /** Seconds per attempt that earns the full speed bonus. */
+  speedFastSeconds: number
+  /** Seconds per attempt at which the speed bonus reaches zero. */
+  speedSlowSeconds: number
   /** Kept at 0 for v1 — the brief asks not to punish wrong taps. */
   incorrectPenalty: number
 }
@@ -78,7 +88,7 @@ export interface AppConfig {
   player: PlayerInputConfig
   audio: AudioConfig
   leaderboard: {
-    /** Rows shown on the leaderboard screen. */
+    /** Rows on the podium and in the ranked list; the full list scrolls. */
     displayLimit: number
     /** Rows retained in storage. */
     storageLimit: number
@@ -93,9 +103,9 @@ export const config: AppConfig = {
   },
 
   levels: [
-    { id: 1, rows: 3, columns: 4, pairs: 6, timeLimit: 45 },
-    { id: 2, rows: 4, columns: 4, pairs: 8, timeLimit: 60 },
-    { id: 3, rows: 4, columns: 5, pairs: 10, timeLimit: 75 },
+    { id: 1, rows: 3, columns: 4, pairs: 6, timeLimit: 45, scoreMultiplier: 1 },
+    { id: 2, rows: 4, columns: 4, pairs: 8, timeLimit: 60, scoreMultiplier: 1.5 },
+    { id: 3, rows: 4, columns: 5, pairs: 10, timeLimit: 75, scoreMultiplier: 2 },
   ],
 
   scoring: {
@@ -103,6 +113,11 @@ export const config: AppConfig = {
     streakBonusPerLevel: 25,
     maxStreakMultiplier: 5,
     timeBonusPerSecond: 10,
+    clearBonus: 200,
+    accuracyBonusMax: 300,
+    speedBonusMax: 200,
+    speedFastSeconds: 1.5,
+    speedSlowSeconds: 5,
     incorrectPenalty: 0,
   },
 
@@ -135,7 +150,7 @@ export const config: AppConfig = {
   },
 
   leaderboard: {
-    displayLimit: 10,
-    storageLimit: 100,
+    displayLimit: 1000,
+    storageLimit: 1000,
   },
 }

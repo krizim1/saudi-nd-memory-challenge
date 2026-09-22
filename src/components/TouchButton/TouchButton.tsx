@@ -23,7 +23,7 @@ const sizeClass: Record<Size, string> = {
 
 const variantClass: Record<Variant, string> = {
   primary:
-    'bg-accent text-text-inverse shadow-[0_12px_40px_-12px_rgba(216,178,94,0.7)] border border-accent/40',
+    'bg-accent text-text-inverse shadow-[0_12px_40px_-12px_rgba(90,186,28,0.6)] border border-accent/40',
   secondary:
     'bg-surface-raised text-text-primary border border-white/15 backdrop-blur-sm',
   ghost: 'bg-transparent text-text-secondary border border-white/10',

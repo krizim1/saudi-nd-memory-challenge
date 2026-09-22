@@ -22,6 +22,7 @@ export const ar = {
 
   attract: {
     tapToStart: 'المس الشاشة للبدء',
+    viewLeaderboard: 'لوحة المتصدرين',
   },
 
   mode: {
@@ -81,7 +82,12 @@ export const ar = {
     getReadyNext: 'استعد للمستوى التالي',
     matchScore: 'المطابقات',
     streakBonus: 'مكافأة التتابع',
+    accuracyBonus: 'مكافأة الدقة',
+    speedBonus: 'مكافأة السرعة',
     timeBonus: 'مكافأة الوقت',
+    clearBonus: 'إنهاء المستوى',
+    subtotal: 'المجموع',
+    multiplier: (m: number) => `مضاعف المستوى ×${m}`,
     levelTotal: 'مجموع المستوى',
   },
 
@@ -125,6 +131,9 @@ export const ar = {
     champion: 'البطل',
     latest: 'جولتك',
     participants: (n: number) => `${n} مشارك`,
+    allPlayers: 'جميع اللاعبين',
+    accuracy: 'الدقة',
+    back: 'رجوع',
   },
 
   admin: {

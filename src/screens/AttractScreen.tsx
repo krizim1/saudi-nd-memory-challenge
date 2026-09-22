@@ -18,9 +18,11 @@ import { useSettingsStore } from '../store/settingsStore'
  */
 export function AttractScreen() {
   const chooseMode = useGameStore((state) => state.chooseMode)
+  const showLeaderboard = useGameStore((state) => state.showLeaderboard)
   const { unlock } = useAudio()
   const gameTitle = useSettingsStore((state) => state.gameTitle)
   const eventTitle = useSettingsStore((state) => state.eventTitle)
+  const leaderboardEnabled = useSettingsStore((state) => state.showLeaderboard)
   const tagline = config.branding.tagline
   const adminTap = useAdminGesture()
 
@@ -57,9 +59,24 @@ export function AttractScreen() {
           <p className="text-3xl text-text-primary/90">{tagline}</p>
         </div>
 
-        <TouchButton size="xl" onClick={start}>
-          {t.common.startChallenge}
-        </TouchButton>
+        <div className="flex items-center gap-6">
+          <TouchButton size="xl" onClick={start}>
+            {t.common.startChallenge}
+          </TouchButton>
+          {/* Must not also start a game, so the tap stops here. */}
+          {leaderboardEnabled && (
+          <TouchButton
+            size="xl"
+            variant="secondary"
+            onClick={(event) => {
+              event.stopPropagation()
+              showLeaderboard()
+            }}
+          >
+            {t.attract.viewLeaderboard}
+          </TouchButton>
+          )}
+        </div>
 
         <motion.p
           animate={{ opacity: [0.35, 1, 0.35] }}

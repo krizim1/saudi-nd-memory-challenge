@@ -2,7 +2,7 @@ import { IDBFactory } from 'fake-indexeddb'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import { createPlayer } from '../game/players'
-import type { LeaderboardEntry } from '../game/types'
+import type { LeaderboardEntry, LevelResult } from '../game/types'
 import { createLeaderboardRepository, withMemoryFallback } from './createLeaderboardRepository'
 import { IndexedDbLeaderboardRepository } from './indexedDbLeaderboardRepository'
 import {
@@ -159,8 +159,18 @@ describe('compareEntries', () => {
 })
 
 describe('entryFromPlayer', () => {
-  it('carries the player name, total score and total time', () => {
-    const player = { ...createPlayer('عبدالله'), totalScore: 8420, totalTime: 140 }
+  it('carries the player name, score, time and performance detail', () => {
+    const cleared = { clearBonus: 200 } as LevelResult['breakdown']
+    const timedOut = { clearBonus: 0 } as LevelResult['breakdown']
+    const player = {
+      ...createPlayer('عبدالله'),
+      totalScore: 8420,
+      totalTime: 140,
+      matches: 22,
+      attempts: 30,
+      bestStreak: 7,
+      levelResults: [{ breakdown: cleared }, { breakdown: cleared }, { breakdown: timedOut }] as LevelResult[],
+    }
     const date = new Date('2026-09-01T12:00:00.000Z')
 
     expect(entryFromPlayer(player, date)).toEqual({
@@ -168,6 +178,10 @@ describe('entryFromPlayer', () => {
       score: 8420,
       totalTime: 140,
       date: '2026-09-01T12:00:00.000Z',
+      matches: 22,
+      attempts: 30,
+      bestStreak: 7,
+      levelsCleared: 2,
     })
   })
 })

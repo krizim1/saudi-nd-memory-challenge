@@ -8,9 +8,9 @@ import { useGameStore } from '../store/gameStore'
 import { formatDuration, formatScore } from '../utils/format'
 
 /**
- * The podium takes the first three places; everyone after them goes into
- * a two-column ranked list. Splitting it this way is what lets ten rows
- * fit a 1080-pixel-high screen without shrinking any of them.
+ * The podium takes the first three places; every other player follows in
+ * a ranked list that scrolls, so the whole field is visible — not just a
+ * top ten.
  */
 const PODIUM_SIZE = 3
 
@@ -88,7 +88,7 @@ function PodiumCard({ rank, entry, isRecent }: PodiumCardProps) {
     <div className={`${style.order} ${style.lift} flex min-w-0 flex-1 flex-col justify-end`}>
       <div
         className={`rounded-[1.75rem] bg-gradient-to-b p-[3px] ${style.metal} ${entry ? '' : 'opacity-30'} ${
-          isRecent ? 'shadow-[0_0_0_4px_rgba(216,178,94,0.35),0_0_40px_rgba(216,178,94,0.45)]' : ''
+          isRecent ? 'shadow-[0_0_0_4px_rgba(90,186,28,0.35),0_0_40px_rgba(90,186,28,0.45)]' : ''
         }`}
       >
         <div className="relative flex flex-col items-center gap-[0.9vh] rounded-[calc(1.75rem-3px)] bg-primary-deep/95 px-6 pt-[4.4vh] pb-[2vh] text-center">
@@ -100,7 +100,7 @@ function PodiumCard({ rank, entry, isRecent }: PodiumCardProps) {
           </span>
 
           {first && (
-            <span className="absolute -top-[8vh] text-accent drop-shadow-[0_2px_8px_rgba(216,178,94,0.6)]">
+            <span className="absolute -top-[8vh] text-accent drop-shadow-[0_2px_8px_rgba(90,186,28,0.6)]">
               <CrownIcon />
             </span>
           )}
@@ -132,6 +132,15 @@ function PodiumCard({ rank, entry, isRecent }: PodiumCardProps) {
   )
 }
 
+/** Matches as a share of attempts, or a dash for rows recorded before it was tracked. */
+function formatAccuracy(entry: LeaderboardEntry): string {
+  if (!entry.attempts || entry.matches === undefined) return '—'
+  return `${Math.round((entry.matches / entry.attempts) * 100)}%`
+}
+
+/** Shared column template, so the header lines up with every row. */
+const listColumns = 'grid grid-cols-[4.5rem_minmax(0,1fr)_7rem_7rem_9rem] items-center gap-4'
+
 interface RankRowProps {
   rank: number
   entry: LeaderboardEntry
@@ -141,32 +150,37 @@ interface RankRowProps {
 function RankRow({ rank, entry, isRecent }: RankRowProps) {
   return (
     <li
-      className={`flex h-[5.6vh] min-h-11 items-center gap-4 rounded-2xl border px-5 ${
+      className={`${listColumns} min-h-[5.4vh] rounded-2xl border px-5 py-[0.7vh] ${
         isRecent
-          ? 'border-accent bg-accent/15 shadow-[0_0_24px_rgba(216,178,94,0.3)]'
+          ? 'border-accent bg-accent/15 shadow-[0_0_24px_rgba(90,186,28,0.3)]'
           : 'border-white/10 bg-surface'
       }`}
     >
-      <span className="text-display flex h-[4vh] min-h-8 w-[4vh] min-w-8 shrink-0 items-center justify-center rounded-full border border-accent/50 bg-primary-deep text-[clamp(1rem,2.1vh,1.5rem)] leading-none text-accent">
+      <span className="text-display flex h-[4vh] min-h-8 w-[4vh] min-w-8 items-center justify-center rounded-full border border-accent/50 bg-primary-deep text-[clamp(1rem,2.1vh,1.5rem)] leading-none text-accent">
         {rank}
       </span>
 
-      <span className="min-w-0 flex-1 truncate text-[clamp(1.1rem,2.5vh,1.8rem)] leading-tight text-text-primary">
-        {entry.playerName}
+      <span className="flex min-w-0 items-center gap-3">
+        <span className="truncate text-[clamp(1.1rem,2.5vh,1.8rem)] leading-tight text-text-primary">
+          {entry.playerName}
+        </span>
+        {isRecent && (
+          <span className="shrink-0 rounded-full bg-accent px-3 py-0.5 text-[clamp(0.8rem,1.6vh,1.1rem)] font-bold text-text-inverse">
+            {t.leaderboard.latest}
+          </span>
+        )}
       </span>
 
-      {isRecent && (
-        <span className="shrink-0 rounded-full bg-accent px-3 py-0.5 text-[clamp(0.8rem,1.6vh,1.1rem)] font-bold text-text-inverse">
-          {t.leaderboard.latest}
-        </span>
-      )}
+      <span className="text-center text-[clamp(0.95rem,2vh,1.35rem)] text-text-secondary">
+        {formatAccuracy(entry)}
+      </span>
 
-      <span className="flex shrink-0 items-center gap-1.5 text-[clamp(0.9rem,1.9vh,1.3rem)] leading-none text-text-secondary">
+      <span className="flex items-center justify-center gap-1.5 text-[clamp(0.9rem,1.9vh,1.3rem)] leading-none text-text-secondary">
         <ClockIcon />
         {formatDuration(entry.totalTime)}
       </span>
 
-      <span className="text-display w-[6.5ch] shrink-0 text-end text-[clamp(1.2rem,2.8vh,2rem)] leading-none text-text-primary">
+      <span className="text-display text-end text-[clamp(1.2rem,2.8vh,2rem)] leading-none text-text-primary">
         {formatScore(entry.score)}
       </span>
     </li>
@@ -181,14 +195,10 @@ export function LeaderboardScreen() {
   const podium = shown.slice(0, PODIUM_SIZE)
   const rest = shown.slice(PODIUM_SIZE)
 
-  // Two columns filled top to bottom, right column first in RTL.
-  const half = Math.ceil(rest.length / 2)
-  const columns = [rest.slice(0, half), rest.slice(half)].filter((column) => column.length > 0)
-
   return (
     <ScreenLayout background="leaderboard" scrim="strong">
-      <div className="flex h-full w-full max-w-[1500px] flex-col items-center justify-center gap-[2vh]">
-        <header className="flex flex-col items-center gap-[0.8vh] text-center">
+      <div className="flex h-full min-h-0 w-full max-w-[1500px] flex-col items-center justify-center gap-[1.8vh]">
+        <header className="flex shrink-0 flex-col items-center gap-[0.8vh] text-center">
           <span className="text-display text-[clamp(0.95rem,2vh,1.4rem)] tracking-[0.35em] text-accent">
             {t.leaderboard.subtitle}
           </span>
@@ -215,7 +225,7 @@ export function LeaderboardScreen() {
           <>
             <section
               aria-label={t.leaderboard.title}
-              className="flex w-full max-w-5xl items-end gap-[2vw] pt-[6.5vh]"
+              className="flex w-full max-w-5xl shrink-0 items-end gap-[2vw] pt-[6.5vh]"
             >
               {[1, 2, 3].map((rank) => (
                 <PodiumCard
@@ -228,28 +238,35 @@ export function LeaderboardScreen() {
             </section>
 
             {rest.length > 0 && (
-              <section className="grid w-full max-w-6xl grid-cols-2 gap-x-[2vw] gap-y-0">
-                {columns.map((column, columnIndex) => (
-                  <ul key={columnIndex} className="flex flex-col gap-[0.9vh]">
-                    {column.map((entry, rowIndex) => {
-                      const rank = PODIUM_SIZE + columnIndex * half + rowIndex + 1
-                      return (
-                        <RankRow
-                          key={entry.id}
-                          rank={rank}
-                          entry={entry}
-                          isRecent={recentIds.has(entry.id)}
-                        />
-                      )
-                    })}
-                  </ul>
-                ))}
+              <section
+                aria-label={t.leaderboard.allPlayers}
+                className="flex min-h-0 w-full max-w-6xl flex-1 flex-col gap-[0.8vh]"
+              >
+                <div className={`${listColumns} px-5 text-[clamp(0.85rem,1.8vh,1.15rem)] text-text-secondary`}>
+                  <span>{t.leaderboard.rank}</span>
+                  <span>{t.leaderboard.allPlayers}</span>
+                  <span className="text-center">{t.leaderboard.accuracy}</span>
+                  <span className="text-center">{t.leaderboard.time}</span>
+                  <span className="text-end">{t.leaderboard.score}</span>
+                </div>
+
+                {/* Scrolls on its own so the podium and buttons stay put. */}
+                <ul className="flex min-h-0 flex-1 touch-pan-y flex-col gap-[0.8vh] overflow-y-auto overscroll-contain pe-1">
+                  {rest.map((entry, index) => (
+                    <RankRow
+                      key={entry.id}
+                      rank={PODIUM_SIZE + index + 1}
+                      entry={entry}
+                      isRecent={recentIds.has(entry.id)}
+                    />
+                  ))}
+                </ul>
               </section>
             )}
           </>
         )}
 
-        <div className="flex items-center gap-8">
+        <div className="flex shrink-0 items-center gap-8">
           <TouchButton size="xl" onClick={resetGame}>
             {t.common.newChallenge}
           </TouchButton>

@@ -2,6 +2,23 @@ import { config } from '../app/config'
 import { IndexedDbLeaderboardRepository } from './indexedDbLeaderboardRepository'
 import type { LeaderboardRepository } from './leaderboardRepository'
 import { MemoryLeaderboardRepository } from './memoryLeaderboardRepository'
+import { SupabaseLeaderboardRepository } from './supabaseLeaderboardRepository'
+
+/**
+ * The shared database, when the build was given one.
+ *
+ * Set `VITE_SUPABASE_URL` and `VITE_SUPABASE_ANON_KEY` (a `.env.local`
+ * file locally, repository variables for the GitHub Pages build). Without
+ * them the game keeps its standings in this browser only.
+ */
+export function createRemoteLeaderboardRepository(
+  storageLimit: number = config.leaderboard.storageLimit,
+): LeaderboardRepository | null {
+  const url = import.meta.env.VITE_SUPABASE_URL as string | undefined
+  const key = import.meta.env.VITE_SUPABASE_ANON_KEY as string | undefined
+  if (!url || !key) return null
+  return new SupabaseLeaderboardRepository(url, key, storageLimit)
+}
 
 /**
  * Picks the best storage the browser actually offers.

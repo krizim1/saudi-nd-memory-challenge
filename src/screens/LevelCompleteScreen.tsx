@@ -25,7 +25,7 @@ const sequence = {
 
 function BreakdownRow({ label, value }: { label: string; value: number }) {
   return (
-    <div className="flex items-center justify-between gap-10 text-2xl">
+    <div className="flex items-center justify-between gap-10 text-[clamp(1.1rem,2.3vh,1.5rem)]">
       <span className="text-text-secondary">{label}</span>
       <span className="text-display text-text-primary">+{formatScore(value)}</span>
     </div>
@@ -60,7 +60,7 @@ export function LevelCompleteScreen() {
         variants={sequence}
         initial="hidden"
         animate="shown"
-        className="flex flex-col items-center gap-8 text-center"
+        className="flex flex-col items-center gap-6 text-center"
       >
         <motion.h1
           variants={reveal}
@@ -76,14 +76,25 @@ export function LevelCompleteScreen() {
         {result && (
           <motion.div
             variants={reveal}
-            className="flex w-full min-w-[28rem] flex-col gap-3 rounded-3xl border border-white/10 bg-surface px-10 py-8"
+            className="flex w-full min-w-[30rem] flex-col gap-2 rounded-3xl border border-white/10 bg-surface px-10 py-6"
           >
             <BreakdownRow label={t.levelComplete.matchScore} value={result.breakdown.matchScore} />
-            <BreakdownRow
-              label={t.levelComplete.streakBonus}
-              value={result.breakdown.streakBonus}
-            />
+            <BreakdownRow label={t.levelComplete.streakBonus} value={result.breakdown.streakBonus} />
+            <BreakdownRow label={t.levelComplete.accuracyBonus} value={result.breakdown.accuracyBonus} />
+            <BreakdownRow label={t.levelComplete.speedBonus} value={result.breakdown.speedBonus} />
             <BreakdownRow label={t.levelComplete.timeBonus} value={result.breakdown.timeBonus} />
+            <BreakdownRow label={t.levelComplete.clearBonus} value={result.breakdown.clearBonus} />
+
+            {result.breakdown.multiplier !== 1 && (
+              <div className="mt-1 flex items-center justify-between gap-10 border-t border-white/10 pt-3 text-[clamp(1.1rem,2.3vh,1.5rem)]">
+                <span className="text-text-secondary">
+                  {t.levelComplete.subtotal} · {t.levelComplete.multiplier(result.breakdown.multiplier)}
+                </span>
+                <span className="text-display text-text-primary">
+                  {formatScore(result.breakdown.subtotal)} ×{result.breakdown.multiplier}
+                </span>
+              </div>
+            )}
 
             <div className="mt-3 flex items-center justify-between gap-10 border-t border-white/15 pt-4">
               <span className="text-display text-2xl text-accent">

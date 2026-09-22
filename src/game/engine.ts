@@ -195,21 +195,24 @@ export function isFinished(state: EngineState): boolean {
 }
 
 /**
- * The score so far, excluding the time bonus — that is only banked by
- * clearing the level, so showing it during play would be a promise the
- * clock might break.
+ * The score so far: matches and streak, weighted by the level. Accuracy,
+ * speed and time are settled only when the level ends.
  */
 export function currentScore(state: EngineState): number {
-  return runningScore(state.matches, state.streakBonus)
+  return runningScore(state.matches, state.streakBonus, state.level.scoreMultiplier ?? 1)
 }
 
 /** Full breakdown for a level, valid at any point but meant for the end. */
 export function scoreBreakdown(state: EngineState): ScoreBreakdown {
   return scoreLevel({
     matches: state.matches,
+    attempts: state.attempts,
+    pairs: state.level.pairs,
     streakBonus: state.streakBonus,
     timeRemaining: state.timeRemaining,
+    timeLimit: state.level.timeLimit,
     cleared: state.status === 'cleared',
+    multiplier: state.level.scoreMultiplier ?? 1,
   })
 }
 

@@ -9,7 +9,8 @@
 import type { GamePhase } from '../game/types'
 
 export const phaseTransitions: Record<GamePhase, readonly GamePhase[]> = {
-  attract: ['mode-select'],
+  // The standings can be opened from the idle screen as well as after a round.
+  attract: ['mode-select', 'leaderboard'],
   'mode-select': ['registration', 'attract'],
   registration: ['challenge-intro', 'mode-select', 'attract'],
   'challenge-intro': ['player-ready', 'attract'],

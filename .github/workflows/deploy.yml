@@ -47,6 +47,11 @@ jobs:
       - name: Build
         # ${GITHUB_REPOSITORY#*/} strips the owner, leaving the repo name.
         run: npx vite build --base="/${GITHUB_REPOSITORY#*/}/"
+        # Optional shared leaderboard. Set both as repository variables
+        # (Settings → Secrets and variables → Actions → Variables).
+        env:
+          VITE_SUPABASE_URL: ${{ vars.VITE_SUPABASE_URL }}
+          VITE_SUPABASE_ANON_KEY: ${{ vars.VITE_SUPABASE_ANON_KEY }}
 
       - uses: actions/upload-pages-artifact@v3
         with:

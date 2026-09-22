@@ -42,6 +42,10 @@ export function entryFromPlayer(player: Player, date: Date = new Date()): NewLea
     score: player.totalScore,
     totalTime: player.totalTime,
     date: date.toISOString(),
+    matches: player.matches,
+    attempts: player.attempts,
+    bestStreak: player.bestStreak,
+    levelsCleared: player.levelResults.filter((result) => result.breakdown.clearBonus > 0).length,
   }
 }
 

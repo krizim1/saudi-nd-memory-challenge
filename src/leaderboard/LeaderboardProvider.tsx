@@ -2,7 +2,11 @@ import { useCallback, useEffect, useMemo, useState, type ReactNode } from 'react
 
 import { config } from '../app/config'
 import type { LeaderboardEntry, Player } from '../game/types'
-import { createLeaderboardRepository, withMemoryFallback } from './createLeaderboardRepository'
+import {
+  createLeaderboardRepository,
+  createRemoteLeaderboardRepository,
+  withMemoryFallback,
+} from './createLeaderboardRepository'
 import { entryFromPlayer, type LeaderboardRepository } from './leaderboardRepository'
 import { LeaderboardContext, type LeaderboardApi } from './leaderboardContext'
 
@@ -20,7 +24,9 @@ interface LeaderboardProviderProps {
  */
 export function LeaderboardProvider({ children, repository }: LeaderboardProviderProps) {
   const store = useMemo(
-    () => repository ?? withMemoryFallback(createLeaderboardRepository()),
+    () =>
+      repository ??
+      withMemoryFallback(createRemoteLeaderboardRepository() ?? createLeaderboardRepository()),
     [repository],
   )
 

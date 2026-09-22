@@ -358,9 +358,18 @@ describe('scoring integration', () => {
     expect(breakdown.matchScore).toBe(config.scoring.matchPoints * 2)
     expect(breakdown.streakBonus).toBe(config.scoring.streakBonusPerLevel)
     expect(breakdown.timeBonus).toBe(20 * config.scoring.timeBonusPerSecond)
-    expect(breakdown.total).toBe(
-      breakdown.matchScore + breakdown.streakBonus + breakdown.timeBonus,
+    expect(breakdown.clearBonus).toBe(config.scoring.clearBonus)
+    // Two flips, two matches: perfect accuracy on a cleared board.
+    expect(breakdown.accuracyBonus).toBe(config.scoring.accuracyBonusMax)
+    expect(breakdown.subtotal).toBe(
+      breakdown.matchScore +
+        breakdown.streakBonus +
+        breakdown.accuracyBonus +
+        breakdown.speedBonus +
+        breakdown.timeBonus +
+        breakdown.clearBonus,
     )
+    expect(breakdown.total).toBe(Math.round(breakdown.subtotal * breakdown.multiplier))
   })
 
   it('scores a timed-out level on its matches alone', () => {
@@ -371,7 +380,20 @@ describe('scoring integration', () => {
 
     expect(state.status).toBe('timeout')
     expect(result.breakdown.timeBonus).toBe(0)
-    expect(result.score).toBe(config.scoring.matchPoints)
+    expect(result.breakdown.clearBonus).toBe(0)
+    expect(result.breakdown.matchScore).toBe(config.scoring.matchPoints)
+    // The pace was far too slow for any speed bonus.
+    expect(result.breakdown.speedBonus).toBe(0)
+    expect(result.score).toBe(result.breakdown.total)
+  })
+
+  it('weights the score by the level multiplier', () => {
+    const plain = playPair(playPair(newGame(), 0), 1)
+    const doubled = playPair(playPair(newGame({ ...level, scoreMultiplier: 2 }), 0), 1)
+
+    expect(scoreBreakdown(doubled).subtotal).toBe(scoreBreakdown(plain).subtotal)
+    expect(scoreBreakdown(doubled).total).toBe(scoreBreakdown(plain).total * 2)
+    expect(currentScore(doubled)).toBe(currentScore(plain) * 2)
   })
 
   it('rewards an unbroken run over the same matches with a break', () => {
